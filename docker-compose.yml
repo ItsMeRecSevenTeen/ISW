@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:9.1.0 # Descarga la versión exacta de MySQL
+    container_name: pos_mysql_container # Nombre del Contenedor
+    restart: always # Reinicia el contenedor si se detiene
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password_isw # La contraseña de la DB para el Equipo
+      MYSQL_DATABASE: db_isw # Nombre de la base de datos
+    ports:
+      - "3306:3306" # Ruteo del puerto 3306 del contenedor al 3306 de la PC anfitriona
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data: # Con esto los datos no se borrarán si se apaga el contenedor
