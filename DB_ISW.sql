@@ -115,3 +115,7 @@ VALUES
 
 -- Re-enable foreign key checks
 SET FOREIGN_KEY_CHECKS = 1;
+
+USE db_isw;
+INSERT INTO usuario (nombre_usuario, contrasena_hash, rol, activo) 
+VALUES ('admin', SHA2('admin123', 256), 0, true); -- 0 administrador, 1 cajero
