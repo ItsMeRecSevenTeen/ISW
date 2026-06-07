@@ -13,7 +13,21 @@ public class LoginPanel extends javax.swing.JPanel {
 
     /** Creates new form LoginPanel */
     public LoginPanel() {
-        initComponents();
+        initComponents(); // Netbeans crea los componentes aquí
+        //Establece la fuente a tamaño 56
+        jLabel1.putClientProperty("FlatLaf.style", "font: 56 'DearSans-Book'");
+        //Redondeo de botón, es necesario que el botón tenga una proporción 1:1
+        jButton1.putClientProperty("JButton.buttonType", "roundRect");
+        jButton1.putClientProperty("FlatLaf.style", "font: 46 'DearSans-Book'");
+        jButton1.setFocusable(false); //Para que no se coloree el borde del botón
+        jButton1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/admin.svg", (float) 7.0));
+        
+        jLabel2.putClientProperty("FlatLaf.style", "font: 36 'DearSans-Book'");
+        
+        jButton2.putClientProperty("JButton.buttonType", "roundRect");
+        jButton2.putClientProperty("FlatLaf.style", "font: 46 'DearSans-Book'");
+        jButton2.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/user.svg", (float) 7.0));
+        jButton2.setFocusable(false);
     }
 
     /** This method is called from within the constructor to
@@ -25,20 +39,101 @@ public class LoginPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("BIENVENIDO");
+
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setText("IDENTIFICARSE");
+
+        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/group.png"))); // NOI18N
+        jButton1.setText("Administrador");
+        jButton1.setToolTipText("");
+        jButton1.setFocusable(false);
+        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton1.setIconTextGap(30);
+        jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton1.addActionListener(this::jButton1ActionPerformed);
+
+        jButton2.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/user-svgrepo-com.png"))); // NOI18N
+        jButton2.setText("Cajero");
+        jButton2.setFocusable(false);
+        jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton2.setIconTextGap(30);
+        jButton2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton2.addActionListener(this::jButton2ActionPerformed);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(82, 82, 82)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(50, 50, 50)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(400, 400, 400)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE))))
+                .addContainerGap(63, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(26, 26, 26)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel2)
+                .addGap(62, 62, 62)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(44, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+    
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // Obtener la info del frame principal
+        MainFrame framePrincipal = (MainFrame) javax.swing.SwingUtilities.getWindowAncestor(this);
+        if (framePrincipal != null) {
+            // Instanciar el nuevo panel del Login de Administrador
+            AdminLoginPanel panelAdmin = new AdminLoginPanel();
+
+            // Mandar a hacer el intercambio
+            framePrincipal.cambiarPanel(panelAdmin);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // Obtener la info del frame principal
+        MainFrame framePrincipal = (MainFrame) javax.swing.SwingUtilities.getWindowAncestor(this);
+        if (framePrincipal != null) {
+            // Instanciar el nuevo panel del Login de Administrador
+            CajeroLoginPanel panelCajero = new CajeroLoginPanel();
+
+            // Mandar a hacer el intercambio
+            framePrincipal.cambiarPanel(panelCajero);
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     // End of variables declaration//GEN-END:variables
 
 }
