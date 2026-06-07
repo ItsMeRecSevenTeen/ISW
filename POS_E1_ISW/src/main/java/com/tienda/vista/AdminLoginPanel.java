@@ -119,21 +119,21 @@ public class AdminLoginPanel extends javax.swing.JPanel {
                 jTextField1.requestFocus();
             }
             case 0 -> {
-                // Caso cuando el usuario es cajero
+                // Caso cuando el usuario es Administrador
                 MainFrame framePrincipal = (MainFrame) javax.swing.SwingUtilities.getWindowAncestor(this);
                 if (framePrincipal != null) {
-                    // Instanciar el nuevo panel de apertura de caja
-                    AperturaCaja AperturaCaja = new AperturaCaja(); //Para cada ventana, cambiar su constructor
+                    // Instanciar el nuevo panel de inventario panel
+                    InventarioPanel InventarioPanel = new InventarioPanel(); //Para cada ventana, cambiar su constructor
 
                     // Mandar a hacer el intercambio
-                    framePrincipal.cambiarPanel(AperturaCaja);
+                    framePrincipal.cambiarPanel(InventarioPanel);
                 }
             }
             case 1 -> {
-                // Caso cuando el usuario es administrador y quiere entrar a cajero
+                // Caso cuando el usuario es Cajero y quiere entrar a Administrador
                 JOptionPane.showMessageDialog(this,
-                        "Acceso denegado: Tu rol de Administrador no corresponde a esta sección.\nPor favor, usa la ventana de Administrador",
-                        "Incorrespondencia", JOptionPane.WARNING_MESSAGE);
+                        "Acceso denegado: Tu rol de Cajero no corresponde a esta sección \nPor favor, usa la ventana de Cajeros",
+                        "Permisos incorrectos", JOptionPane.WARNING_MESSAGE);
                 jPasswordField1.setText("");
                 jTextField1.setText("");
             }
