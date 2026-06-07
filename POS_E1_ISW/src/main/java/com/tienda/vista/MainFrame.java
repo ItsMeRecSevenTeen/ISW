@@ -4,6 +4,8 @@
  */
 package com.tienda.vista;
 
+import javax.swing.JPanel;
+
 /**
  *
  * @author Rec17
@@ -18,7 +20,12 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
     }
-
+    public void cambiarPanel(JPanel nuevoPanel) {
+        this.getContentPane().removeAll();  // Borra el panel actual (LoginPanel)
+        this.getContentPane().add(nuevoPanel, java.awt.BorderLayout.CENTER); // Añade el nuevo panel en el centro
+        this.getContentPane().revalidate(); // Reajusta los cálculos de diseño
+        this.getContentPane().repaint();    // Repinta los pixeles en la pantalla
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -28,18 +35,10 @@ public class MainFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        loginPanel2 = new com.tienda.vista.LoginPanel();
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().add(loginPanel2, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -70,5 +69,6 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private com.tienda.vista.LoginPanel loginPanel2;
     // End of variables declaration//GEN-END:variables
 }
