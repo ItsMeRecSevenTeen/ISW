@@ -53,7 +53,6 @@ public class LoginPanel extends javax.swing.JPanel {
         jLabel2.setText("IDENTIFICARSE");
 
         jButton1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/group.png"))); // NOI18N
         jButton1.setText("Administrador");
         jButton1.setToolTipText("");
         jButton1.setFocusable(false);
@@ -63,7 +62,6 @@ public class LoginPanel extends javax.swing.JPanel {
         jButton1.addActionListener(this::jButton1ActionPerformed);
 
         jButton2.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/user-svgrepo-com.png"))); // NOI18N
         jButton2.setText("Cajero");
         jButton2.setFocusable(false);
         jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
