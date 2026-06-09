@@ -1,0 +1,14 @@
+<svg id="mockupView-ui-7-78" data-type="com.balsamiq.mockups::Icon" overflow="visible" opacity="1" shadowNode="false" x="458" y="84" width="30" height="30">
+  <g id="mockupView-ui-7-78-clipTransform" transform="translate(3 3)">
+    <clipPath id="mockupView-ui-7-78-mask-0" width="1" height="1" x="0" y="0">
+      <rect x="0" y="0" width="24" height="24" fill="#ffffff"/>
+    </clipPath>
+    <g id="mockupView-ui-7-78-children" transform="translate(0 0)"/>
+    <svg id="mockupView-ui-7-78-displayList" overflow="visible" x="0" y="0">
+      <g clip-path="url(#mockupView-ui-7-78-mask-0)">
+        <path d="M248 72c0-13.3-10.7-24-24-24s-24 10.7-24 24V232H40c-13.3 0-24 10.7-24 24s10.7 24 24 24H200V440c0 13.3 10.7 24 24 24s24-10.7 24-24V280H408c13.3 0 24-10.7 24-24s-10.7-24-24-24H248V72z" transform="translate(1.5 0) rotate(0) scale(0.046875 0.046875) " fill="#333333" fill-opacity="1"/>
+      </g>
+    </svg>
+    <svg id="mockupView-ui-7-78-selection" overflow="visible" x="0" y="0"/>
+  </g>
+</svg>

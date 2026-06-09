@@ -15,6 +15,7 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.io.InputStream;
 import java.sql.SQLException;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 /**
  *
@@ -23,6 +24,19 @@ import javax.swing.UIManager;
 public class POS_E1_ISW {
 
     public static void main(String[] args) throws SQLException {
+        //Modo claro para todos los frames
+        try {
+            UIManager.setLookAndFeel(new FlatMacLightLaf());
+        } catch (Exception ex) {
+            System.err.println("Error al iniciar FlatLaf");
+        }
+        // Modo oscuro para todos los frames
+        //try {
+        //    UIManager.setLookAndFeel( new FlatMacDarkLaf() );
+        //} catch( Exception ex ) {
+        //    System.err.println( "Error al iniciar FlatLaf" );
+        //}
+        
         // Carga de fuentes
         try {
             // La raíz es src -------------------------------------v
@@ -45,36 +59,28 @@ public class POS_E1_ISW {
             System.err.println("Error critico al registrar la fuente: " + e.getMessage());
         }
 
-        // Test de conexion a la db
-        System.out.println("Intentando conectar a MySQL...");
-        Connection cn = Conexion.getConexion();
-
-        if (cn != null) {
-            System.out.println("Conexion exitosa");
-            try {
-                cn.close();
-            } catch (SQLException e) {
-            } // Cerrar la prueba
-        } else {
-            System.out.println("Error critico, Revisa la conexion del Docker");
-        }
-
-        //Modo claro para todos los frames
         try {
-            UIManager.setLookAndFeel(new FlatMacLightLaf());
-        } catch (Exception ex) {
-            System.err.println("Error al iniciar FlatLaf");
-        }
-        // Modo oscuro para todos los frames
-        //try {
-        //    UIManager.setLookAndFeel( new FlatMacDarkLaf() );
-        //} catch( Exception ex ) {
-        //    System.err.println( "Error al iniciar FlatLaf" );
-        //}
+            // Intento de conexión a Docker
+            Connection conn = Conexion.getConexion();
+            
+            if (conn != null && !conn.isClosed()) {
+                conn.close(); // Cierre inmediato, solo para obtener info
+            }
 
-        // Invocando a ventana main
-        java.awt.EventQueue.invokeLater(() -> {
-            new MainFrame().setVisible(true);
-        });
+            // Invocando a ventana main
+            java.awt.EventQueue.invokeLater(() -> {
+                new MainFrame().setVisible(true);
+            });
+
+        } catch (SQLException e) {
+            // Manejo de error cuando Docker no ejecuta
+            System.err.println("Base de datos no disponible: " + e.getMessage());
+
+            java.awt.EventQueue.invokeLater(() -> {
+                // Abriendo ventana de error
+                JOptionPane.showMessageDialog(new JOptionPane(), "No se pudo conectar a la base de datos, Revisa la conexión", "Error de conexión",
+                        JOptionPane.ERROR_MESSAGE);
+            });
+        }
     }
 }
