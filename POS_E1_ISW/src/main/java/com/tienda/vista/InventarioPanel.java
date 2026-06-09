@@ -15,6 +15,23 @@ public class InventarioPanel extends javax.swing.JPanel {
      */
     public InventarioPanel() {
         initComponents();
+        //Establece la fuente a tamaño 56
+        jLabel2.putClientProperty("FlatLaf.style", "font: 56 'DearSans-Book'");
+        jLabel1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/admin.svg", (float) 3.0));
+        // Centrar el contenido (icono + texto) horizontalmente
+//        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+//
+//        // Mover el texto abajo del icono (por defecto Swing lo pone a la derecha)
+//        jLabel2.setVerticalTextPosition(javax.swing.SwingConstants.CENTER);
+//        jLabel2.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+//        jLabel1.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+
+        // Darle espacio de separación entre el icono y el texto
+        jButton1.putClientProperty("JButton.buttonType", "roundRect");
+        jButton2.putClientProperty("JButton.buttonType", "roundRect");
+        jButton3.putClientProperty("JButton.buttonType", "roundRect");
+        jButton3.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/iva.svg", (float) 2.0));
+        jLabel2.setIconTextGap(20);
     }
 
     /**
@@ -26,19 +43,37 @@ public class InventarioPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        jLabel2 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+
+        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setText("Administrador");
+        jLabel2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jLabel2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 60, 460, -1));
+        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 20, 130, 130));
+
+        jButton1.setText("Dar de alta nuevo producto");
+        add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 220, 220, -1));
+
+        jButton2.setText("Agregar cajero");
+        add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 220, 180, -1));
+
+        jButton3.setText("Modificar IVA");
+        add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 220, 200, -1));
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     // End of variables declaration//GEN-END:variables
 }
