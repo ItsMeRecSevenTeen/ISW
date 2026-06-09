@@ -4,6 +4,12 @@
  */
 package com.tienda.vista;
 
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+
 /**
  *
  * @author Rec17
@@ -15,6 +21,38 @@ public class InventarioPanel extends javax.swing.JPanel {
      */
     public InventarioPanel() {
         initComponents();
+
+        // Crea el menú flotante
+        JPopupMenu menuUsuario = new JPopupMenu();
+
+        //Crea la opción de cerrar sesión
+        JMenuItem itemCerrarSesion = new JMenuItem("Cerrar sesión");
+        // Icono
+        // itemCerrarSesion.setIcon(Icono); //Por si quiero importar un icono, pero 
+        // no lo dice Diseño
+
+        // Agregar la acción al botón de cerrar sesión
+        itemCerrarSesion.addActionListener(e -> {
+            MainFrame framePrincipal = (MainFrame) javax.swing.SwingUtilities.getWindowAncestor(this);
+            if (framePrincipal != null) {
+                // Instanciar el nuevo panel del Login de Administrador
+                LoginPanel LoginPanel = new LoginPanel(); //Para cada ventana, cambiar su constructor
+
+                // Mandar a hacer el intercambio
+                framePrincipal.cambiarPanel(LoginPanel);
+            }
+        });
+        // Agregar el evento de clic al ícono de administrador
+        jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                // .show(componente_origen, coordenada_X, coordenada_Y)
+                // X en 0 y Y justo al final de la altura del ícono para cuadrarlo bien
+                menuUsuario.show(jLabel1, 0, jLabel1.getHeight());
+            }
+        });
+        // Meter el ítem al menú
+        menuUsuario.add(itemCerrarSesion);
         //Establece la fuente a tamaño 56
         jLabel2.putClientProperty("FlatLaf.style", "font: 56 'DearSans-Book'");
         jLabel1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/admin.svg", (float) 3.0));
@@ -23,14 +61,26 @@ public class InventarioPanel extends javax.swing.JPanel {
 //
 //        // Mover el texto abajo del icono (por defecto Swing lo pone a la derecha)
 //        jLabel2.setVerticalTextPosition(javax.swing.SwingConstants.CENTER);
-//        jLabel2.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
-//        jLabel1.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+//        
+        
 
         // Darle espacio de separación entre el icono y el texto
+        jButton1.setText("<html><body style='margin-top: 2px;'>Dar de alta nuevo producto</body></html>");
+
+        jButton1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/plus.svg", (float) 1.0));
+        jButton1.putClientProperty("FlatLaf.style", "font: 20 'DearSans-Book'");
         jButton1.putClientProperty("JButton.buttonType", "roundRect");
+        
+        jButton2.setText("<html><body style='margin-top: 2px;'>Añadir Cajero</body></html>");
+        jButton2.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/useradd.svg", (float) 1.0));
+        jButton2.putClientProperty("FlatLaf.style", "font: 20 'DearSans-Book'");
         jButton2.putClientProperty("JButton.buttonType", "roundRect");
+        
+        jButton3.setText("<html><body style='margin-top: 2px;'>Modificar IVA</body></html>");
+        jButton3.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/iva.svg", (float) 1.0));
+        jButton3.putClientProperty("FlatLaf.style", "font: 20 'DearSans-Book'");
         jButton3.putClientProperty("JButton.buttonType", "roundRect");
-        jButton3.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/iva.svg", (float) 2.0));
+        
         jLabel2.setIconTextGap(20);
     }
 
@@ -48,6 +98,8 @@ public class InventarioPanel extends javax.swing.JPanel {
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
 
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -59,14 +111,64 @@ public class InventarioPanel extends javax.swing.JPanel {
         add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 20, 130, 130));
 
         jButton1.setText("Dar de alta nuevo producto");
-        add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 220, 220, -1));
+        add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 190, 370, -1));
 
         jButton2.setText("Agregar cajero");
-        add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 220, 180, -1));
+        add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 190, 270, -1));
 
         jButton3.setText("Modificar IVA");
-        add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 220, 200, -1));
+        jButton3.addActionListener(this::jButton3ActionPerformed);
+        add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 190, 260, -1));
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
+            },
+            new String [] {
+                "Nombre", "SKU", "Precio", "Precio de compra", "Acciones", "Stock actual", "Stock mínimo"
+            }
+        ));
+        jScrollPane1.setViewportView(jTable1);
+
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 270, 1090, -1));
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // Spinner (ValorInicial, Mínimo, Máximo, Paso/Incremento)
+        // Numero 16 como valor inicial con rango de 0 a 100 y avanza de 1 en 1
+        SpinnerNumberModel modeloIva = new SpinnerNumberModel(16, 0, 100, 1);
+        JSpinner spinnerIva = new JSpinner(modeloIva);
+
+        // Hacer que el texto del spinner termine con el símbolo de porcentaje
+        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(spinnerIva, "#'%'");
+        spinnerIva.setEditor(editor);
+
+        // Meter el spinner dentro de un JDialog modal usando JOptionPane
+        // Crea la ventana pequeña, centrada y con botones de OK/Cancelar
+        int opcion = JOptionPane.showOptionDialog(
+                this, // Ventana padre (bloquea el MainFrame)
+                spinnerIva, // Componente que se va a mostrar dentro
+                "Modificar porcentaje de IVA", // Título de la ventanita
+                JOptionPane.OK_CANCEL_OPTION, // Botones debajo
+                JOptionPane.QUESTION_MESSAGE, // Ícono de la ventana
+                null, null, null
+        );
+
+        // Procesado de la respuesta del usuario
+        if (opcion == JOptionPane.OK_OPTION) {
+            // Obtenemos el valor numérico directamente
+            int nuevoIva = (int) spinnerIva.getValue();
+
+            System.out.println("El nuevo IVA guardado es: " + nuevoIva + "%");
+
+            
+            // ConfigurarDAO.actualizarIva(nuevoIva);
+            JOptionPane.showMessageDialog(this, "IVA actualizado correctamente", "Exito", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -75,5 +177,7 @@ public class InventarioPanel extends javax.swing.JPanel {
     private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 }
