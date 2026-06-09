@@ -4,6 +4,7 @@
  */
 package com.tienda.vista;
 
+import com.tienda.dao.ConfiguracionDAO;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -131,20 +132,25 @@ public class InventarioPanel extends javax.swing.JPanel {
                 "Nombre", "SKU", "Precio", "Precio de compra", "Acciones", "Stock actual", "Stock mínimo"
             }
         ));
+        jTable1.setShowGrid(true);
         jScrollPane1.setViewportView(jTable1);
 
         add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 270, 1090, -1));
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        //Instancia de ConfiguracionDAO y hace la query a la DB
+        ConfiguracionDAO configDao = new ConfiguracionDAO();
+        int ivaActual = configDao.getIVA();
         // Spinner (ValorInicial, Mínimo, Máximo, Paso/Incremento)
         // Numero 16 como valor inicial con rango de 0 a 100 y avanza de 1 en 1
-        SpinnerNumberModel modeloIva = new SpinnerNumberModel(16, 0, 100, 1);
+        SpinnerNumberModel modeloIva = new SpinnerNumberModel(ivaActual, 0, 100, 1);
         JSpinner spinnerIva = new JSpinner(modeloIva);
 
         // Hacer que el texto del spinner termine con el símbolo de porcentaje
         JSpinner.NumberEditor editor = new JSpinner.NumberEditor(spinnerIva, "#'%'");
         spinnerIva.setEditor(editor);
+        
 
         // Meter el spinner dentro de un JDialog modal usando JOptionPane
         // Crea la ventana pequeña, centrada y con botones de OK/Cancelar
@@ -162,11 +168,11 @@ public class InventarioPanel extends javax.swing.JPanel {
             // Obtenemos el valor numérico directamente
             int nuevoIva = (int) spinnerIva.getValue();
 
-            System.out.println("El nuevo IVA guardado es: " + nuevoIva + "%");
-
-            
-            // ConfigurarDAO.actualizarIva(nuevoIva);
-            JOptionPane.showMessageDialog(this, "IVA actualizado correctamente", "Exito", JOptionPane.INFORMATION_MESSAGE);
+            if (configDao.modificarIVA(nuevoIva)) {
+                JOptionPane.showMessageDialog(this, "IVA actualizado en la base de datos", "Exito", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "No se pudo actualizar el IVA", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }//GEN-LAST:event_jButton3ActionPerformed
 
