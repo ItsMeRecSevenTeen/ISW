@@ -35,4 +35,8 @@ public class UsuarioDAO {
             return -1; // En caso de error de BD, asumimos que no pasa
         }
     }
+    public boolean registrarCajero(){
+        String sql = "";
+        return false;
+    }
 }

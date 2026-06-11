@@ -115,6 +115,7 @@ public class InventarioPanel extends javax.swing.JPanel {
         add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 190, 370, -1));
 
         jButton2.setText("Agregar cajero");
+        jButton2.addActionListener(this::jButton2ActionPerformed);
         add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 190, 270, -1));
 
         jButton3.setText("Modificar IVA");
@@ -150,7 +151,6 @@ public class InventarioPanel extends javax.swing.JPanel {
         // Hacer que el texto del spinner termine con el símbolo de porcentaje
         JSpinner.NumberEditor editor = new JSpinner.NumberEditor(spinnerIva, "#'%'");
         spinnerIva.setEditor(editor);
-        
 
         // Meter el spinner dentro de un JDialog modal usando JOptionPane
         // Crea la ventana pequeña, centrada y con botones de OK/Cancelar
@@ -175,6 +175,19 @@ public class InventarioPanel extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // Buscar el frame principal que sostiene esta ventana modal
+        java.awt.Frame parentFrame = (java.awt.Frame) javax.swing.SwingUtilities.getWindowAncestor(this);
+
+        // Instanciamos nuestro diálogo personalizado (parent, modal)
+        AltaCajeroDialog dialog = new AltaCajeroDialog(parentFrame, true);
+
+        // Mostrarlo en ventana
+        dialog.setVisible(true);
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+                                               
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
