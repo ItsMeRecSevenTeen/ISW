@@ -14,7 +14,41 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ConfiguracionDAO {
-    public void modificarIVA(){
+    public boolean modificarIVA(int nuevoIva){
+        // La query que modifica el valor existente
+        String sql = "UPDATE configuracion SET valor = ? WHERE clave = 'IVA_PORCENTAJE'";
         
+        try (Connection conn = Conexion.getConexion();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            // Pasamos el entero como String a la BD
+            pstmt.setString(1, String.valueOf(nuevoIva));
+            
+            // executeUpdate() devuelve cuántas filas se modificaron
+            int filasAfectadas = pstmt.executeUpdate();
+            
+            return filasAfectadas > 0; // Retorna true si se actualizó con éxito
+            
+        } catch (SQLException e) {
+            System.err.println("Error en ConfiguracionDAO.actualizarIva: " + e.getMessage());
+            return false;
+        }
+    }
+  
+    public int getIVA() {
+        int iva = 16; // Valor por default
+        String sql = "SELECT valor FROM configuracion WHERE clave = 'IVA_PORCENTAJE'";
+
+        try (Connection conn = Conexion.getConexion(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
+
+            if (rs.next()) {
+                // Se convierte en entero debido a que la columna valor almacena VARCHAR
+                iva = Integer.parseInt(rs.getString("valor"));
+            }
+
+        } catch (SQLException | NumberFormatException e) {
+            System.err.println("Error al obtener el IVA en la DB: " + e.getMessage());
+        }
+        return iva;
     }
 }
