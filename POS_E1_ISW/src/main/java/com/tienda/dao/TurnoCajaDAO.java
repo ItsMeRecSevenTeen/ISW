@@ -4,10 +4,14 @@
  */
 package com.tienda.dao;
 
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Rec17
  */
 public class TurnoCajaDAO {
-    
+    public void registrarApertura(double monto){
+        JOptionPane.showMessageDialog(null,"Guerando en la base de datos el monto de apertura: $"+monto);
+    }
 }

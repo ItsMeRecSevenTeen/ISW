@@ -112,6 +112,7 @@ public class InventarioPanel extends javax.swing.JPanel {
         add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 20, 130, 130));
 
         jButton1.setText("Dar de alta nuevo producto");
+        jButton1.addActionListener(this::jButton1ActionPerformed);
         add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 190, 370, -1));
 
         jButton2.setText("Agregar cajero");
@@ -186,6 +187,10 @@ public class InventarioPanel extends javax.swing.JPanel {
         // Mostrarlo en ventana
         dialog.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
 
                                                
 
