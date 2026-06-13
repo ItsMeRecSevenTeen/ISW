@@ -5,6 +5,7 @@
 package com.tienda.vista;
 
 import com.tienda.dao.UsuarioDAO;
+import com.tienda.util.Sesion;
 import javax.swing.JOptionPane;
 
 /**
@@ -127,6 +128,9 @@ public class CajeroLoginPanel extends javax.swing.JPanel {
                 jTextField1.setText("");
             }
             case 1 -> {
+                // Guardando los datos en la sesión global
+                Sesion.getInstancia().setNombreUsuario(usuarioTxt);
+                Sesion.getInstancia().setRol(1); // El rol 1 por que es cajero
                 // Caso cuando el usuario es Cajero
                 MainFrame framePrincipal = (MainFrame) javax.swing.SwingUtilities.getWindowAncestor(this);
                 if (framePrincipal != null) {
