@@ -35,10 +35,10 @@ public class MainFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        aperturaCaja1 = new com.tienda.vista.AperturaCaja();
+        loginPanel1 = new com.tienda.vista.LoginPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        getContentPane().add(aperturaCaja1, java.awt.BorderLayout.CENTER);
+        getContentPane().add(loginPanel1, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -69,6 +69,6 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private com.tienda.vista.AperturaCaja aperturaCaja1;
+    private com.tienda.vista.LoginPanel loginPanel1;
     // End of variables declaration//GEN-END:variables
 }
