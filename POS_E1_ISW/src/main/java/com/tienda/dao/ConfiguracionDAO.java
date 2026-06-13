@@ -63,18 +63,18 @@ public class ConfiguracionDAO {
         // Si cumple o es mayor, corta hasta la longitud deseada
         return texto.substring(0, longitud);
     }
-    public String generarSKU(String nombre, String marca, String cantidad){
+    public String generarSKU(String nombre, String marca, String tamano){
        String parteNombre="";
        String parteMarca="";
        String parteCantidad="";
        //limpiar espacios en blanco
        nombre=nombre.replaceAll("\\s+", "");
        marca=marca.replaceAll("\\s+", "");
-       cantidad=cantidad.replaceAll("\\s+", "");
+       tamano=tamano.replaceAll("\\s+", "");
       
            parteNombre=obtenerSubcadena(nombre, 4);
            parteMarca=obtenerSubcadena(marca,3);
-           parteCantidad=obtenerSubcadena(cantidad,3);
+           parteCantidad=obtenerSubcadena(tamano,3);
       
        String sku=parteNombre+parteMarca+parteCantidad;
        return sku.toUpperCase();
