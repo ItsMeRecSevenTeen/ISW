@@ -51,4 +51,35 @@ public class ConfiguracionDAO {
         }
         return iva;
     }
+    private String obtenerSubcadena(String texto, int longitud) {
+        // Si el texto está vacío, evitamos errores
+        if (texto == null || texto.isEmpty()) {
+            return "";
+        }
+        // Si el texto es más corto que el límite, lo devuelve completo
+        if (texto.length() < longitud) {
+            return texto;
+        }
+        // Si cumple o es mayor, corta hasta la longitud deseada
+        return texto.substring(0, longitud);
+    }
+    public String generarSKU(String nombre, String marca, String tamano){
+       String parteNombre="";
+       String parteMarca="";
+       String parteCantidad="";
+       //limpiar espacios en blanco
+       nombre=nombre.replaceAll("\\s+", "");
+       marca=marca.replaceAll("\\s+", "");
+       tamano=tamano.replaceAll("\\s+", "");
+      
+           parteNombre=obtenerSubcadena(nombre, 4);
+           parteMarca=obtenerSubcadena(marca,3);
+           parteCantidad=obtenerSubcadena(tamano,3);
+      
+       String sku=parteNombre+parteMarca+parteCantidad;
+       return sku.toUpperCase();
+       
+   }
+  
 }
+
