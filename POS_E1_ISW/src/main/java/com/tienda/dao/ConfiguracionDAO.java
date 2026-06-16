@@ -63,7 +63,7 @@ public class ConfiguracionDAO {
         // Si cumple o es mayor, corta hasta la longitud deseada
         return texto.substring(0, longitud);
     }
-    public String generarSKU(String nombre, String marca, String tamano){
+    public String SKU(String nombre, String marca, String tamano){
        String parteNombre="";
        String parteMarca="";
        String parteCantidad="";

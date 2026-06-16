@@ -3,7 +3,19 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package com.tienda.vista;
-
+import javax.swing.*;
+import java.awt.*;
+import javax.swing.JComponent;
+class ShapeDrawing extends JComponent {
+  
+    public void paint(Graphics g)
+    {
+        Graphics2D g2 = (Graphics2D) g;
+        g2.drawRect(100, 150, 60, 200);
+        
+        
+    }
+}
 /**
  *
  * @author Rec17
@@ -15,6 +27,7 @@ public class VentasPanel extends javax.swing.JPanel {
      */
     public VentasPanel() {
         initComponents();
+        
     }
 
     /**
@@ -26,19 +39,273 @@ public class VentasPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+        jButton1 = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        NombreCajero = new javax.swing.JTextPane();
+        jTextField1 = new javax.swing.JTextField();
+        jSeparator1 = new javax.swing.JSeparator();
+        jPanel1 = new javax.swing.JPanel();
+        jButton2 = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jPanel2 = new javax.swing.JPanel();
+        jButton8 = new javax.swing.JButton();
+        jButton9 = new javax.swing.JButton();
+        jButton10 = new javax.swing.JButton();
+        jButton11 = new javax.swing.JButton();
+        jButton12 = new javax.swing.JButton();
+        jButton13 = new javax.swing.JButton();
+        jButton14 = new javax.swing.JButton();
+        jButton15 = new javax.swing.JButton();
+        jButton16 = new javax.swing.JButton();
+        jButton17 = new javax.swing.JButton();
+        jButton18 = new javax.swing.JButton();
+        jButton19 = new javax.swing.JButton();
+        jButton20 = new javax.swing.JButton();
+        jButton21 = new javax.swing.JButton();
+        jButton22 = new javax.swing.JButton();
+        jButton23 = new javax.swing.JButton();
+        jButton24 = new javax.swing.JButton();
+        jButton25 = new javax.swing.JButton();
+        jButton26 = new javax.swing.JButton();
+        jButton27 = new javax.swing.JButton();
+
+        setBackground(new java.awt.Color(255, 255, 255));
+        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jButton1.setText("jButton1");
+        jButton1.addActionListener(this::jButton1ActionPerformed);
+        add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 30, 30));
+
+        jScrollPane1.setViewportView(NombreCajero);
+
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 10, -1, 30));
+
+        jTextField1.setText("Buscar");
+        jTextField1.addActionListener(this::jTextField1ActionPerformed);
+        add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 10, 320, 30));
+        add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 210, -1, -1));
+
+        jPanel1.setBackground(new java.awt.Color(250, 247, 251));
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jButton2.setBackground(new java.awt.Color(71, 210, 165));
+        jButton2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jButton2.addActionListener(this::jButton2ActionPerformed);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
+                .addContainerGap())
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(302, Short.MAX_VALUE)
+                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
+
+        add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 10, 160, 360));
+
+        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jButton8.setBackground(new java.awt.Color(250, 247, 251));
+        jButton8.setForeground(new java.awt.Color(165, 104, 188));
+        jButton8.setText("jButton8");
+        jButton8.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel2.add(jButton8, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 10, 90, 90));
+
+        jButton9.setBackground(new java.awt.Color(250, 247, 251));
+        jButton9.setForeground(new java.awt.Color(165, 104, 188));
+        jButton9.setText("jButton8");
+        jButton9.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jButton9.addActionListener(this::jButton9ActionPerformed);
+        jPanel2.add(jButton9, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 90, 90));
+
+        jButton10.setBackground(new java.awt.Color(250, 247, 251));
+        jButton10.setForeground(new java.awt.Color(165, 104, 188));
+        jButton10.setText("jButton8");
+        jButton10.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel2.add(jButton10, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 10, 90, 90));
+
+        jButton11.setBackground(new java.awt.Color(250, 247, 251));
+        jButton11.setForeground(new java.awt.Color(165, 104, 188));
+        jButton11.setText("jButton8");
+        jButton11.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel2.add(jButton11, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 110, 90, 90));
+
+        jButton12.setBackground(new java.awt.Color(250, 247, 251));
+        jButton12.setForeground(new java.awt.Color(165, 104, 188));
+        jButton12.setText("jButton8");
+        jButton12.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jButton12.addActionListener(this::jButton12ActionPerformed);
+        jPanel2.add(jButton12, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 90, 90));
+
+        jButton13.setBackground(new java.awt.Color(250, 247, 251));
+        jButton13.setForeground(new java.awt.Color(165, 104, 188));
+        jButton13.setText("jButton8");
+        jButton13.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel2.add(jButton13, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 110, 90, 90));
+
+        jButton14.setBackground(new java.awt.Color(250, 247, 251));
+        jButton14.setForeground(new java.awt.Color(165, 104, 188));
+        jButton14.setText("jButton8");
+        jButton14.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel2.add(jButton14, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 210, 90, 90));
+
+        jButton15.setBackground(new java.awt.Color(250, 247, 251));
+        jButton15.setForeground(new java.awt.Color(165, 104, 188));
+        jButton15.setText("jButton8");
+        jButton15.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jButton15.addActionListener(this::jButton15ActionPerformed);
+        jPanel2.add(jButton15, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 210, 90, 90));
+
+        jButton16.setBackground(new java.awt.Color(250, 247, 251));
+        jButton16.setForeground(new java.awt.Color(165, 104, 188));
+        jButton16.setText("jButton8");
+        jButton16.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel2.add(jButton16, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 210, 90, 90));
+
+        jButton17.setBackground(new java.awt.Color(250, 247, 251));
+        jButton17.setForeground(new java.awt.Color(165, 104, 188));
+        jButton17.setText("jButton8");
+        jButton17.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel2.add(jButton17, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 310, 90, 90));
+
+        jButton18.setBackground(new java.awt.Color(250, 247, 251));
+        jButton18.setForeground(new java.awt.Color(165, 104, 188));
+        jButton18.setText("jButton8");
+        jButton18.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jButton18.addActionListener(this::jButton18ActionPerformed);
+        jPanel2.add(jButton18, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 310, 90, 90));
+
+        jButton19.setBackground(new java.awt.Color(250, 247, 251));
+        jButton19.setForeground(new java.awt.Color(165, 104, 188));
+        jButton19.setText("jButton8");
+        jButton19.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel2.add(jButton19, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 310, 90, 90));
+
+        jButton20.setBackground(new java.awt.Color(250, 247, 251));
+        jButton20.setForeground(new java.awt.Color(165, 104, 188));
+        jButton20.setText("jButton8");
+        jButton20.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel2.add(jButton20, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 410, 90, 90));
+
+        jButton21.setBackground(new java.awt.Color(250, 247, 251));
+        jButton21.setForeground(new java.awt.Color(165, 104, 188));
+        jButton21.setText("jButton8");
+        jButton21.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jButton21.addActionListener(this::jButton21ActionPerformed);
+        jPanel2.add(jButton21, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 410, 90, 90));
+
+        jButton22.setBackground(new java.awt.Color(250, 247, 251));
+        jButton22.setForeground(new java.awt.Color(165, 104, 188));
+        jButton22.setText("jButton8");
+        jButton22.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel2.add(jButton22, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 410, 90, 90));
+
+        jButton23.setBackground(new java.awt.Color(250, 247, 251));
+        jButton23.setForeground(new java.awt.Color(165, 104, 188));
+        jButton23.setText("jButton8");
+        jButton23.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel2.add(jButton23, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 10, 90, 90));
+
+        jButton24.setBackground(new java.awt.Color(250, 247, 251));
+        jButton24.setForeground(new java.awt.Color(165, 104, 188));
+        jButton24.setText("jButton8");
+        jButton24.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel2.add(jButton24, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 110, 90, 90));
+
+        jButton25.setBackground(new java.awt.Color(250, 247, 251));
+        jButton25.setForeground(new java.awt.Color(165, 104, 188));
+        jButton25.setText("jButton8");
+        jButton25.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel2.add(jButton25, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 210, 90, 90));
+
+        jButton26.setBackground(new java.awt.Color(250, 247, 251));
+        jButton26.setForeground(new java.awt.Color(165, 104, 188));
+        jButton26.setText("jButton8");
+        jButton26.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel2.add(jButton26, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 310, 90, 90));
+
+        jButton27.setBackground(new java.awt.Color(250, 247, 251));
+        jButton27.setForeground(new java.awt.Color(165, 104, 188));
+        jButton27.setText("jButton8");
+        jButton27.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel2.add(jButton27, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 410, 90, 90));
+
+        jScrollPane2.setViewportView(jPanel2);
+
+        add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 420, 310));
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton9ActionPerformed
+
+    private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton12ActionPerformed
+
+    private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton15ActionPerformed
+
+    private void jButton18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton18ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton18ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton21ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton21ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton21ActionPerformed
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton2ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextPane NombreCajero;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton10;
+    private javax.swing.JButton jButton11;
+    private javax.swing.JButton jButton12;
+    private javax.swing.JButton jButton13;
+    private javax.swing.JButton jButton14;
+    private javax.swing.JButton jButton15;
+    private javax.swing.JButton jButton16;
+    private javax.swing.JButton jButton17;
+    private javax.swing.JButton jButton18;
+    private javax.swing.JButton jButton19;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton20;
+    private javax.swing.JButton jButton21;
+    private javax.swing.JButton jButton22;
+    private javax.swing.JButton jButton23;
+    private javax.swing.JButton jButton24;
+    private javax.swing.JButton jButton25;
+    private javax.swing.JButton jButton26;
+    private javax.swing.JButton jButton27;
+    private javax.swing.JButton jButton8;
+    private javax.swing.JButton jButton9;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }
