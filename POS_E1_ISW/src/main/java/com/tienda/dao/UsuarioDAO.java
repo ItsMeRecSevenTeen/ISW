@@ -41,7 +41,7 @@ public class UsuarioDAO {
         // Definir la query con placeholders (?) para evitar SQL Injection
         //rol 1 = cajero ------------------------------------------------------------------------------v
         //String sql = "INSERT INTO usuario (nombre_usuario, contrasena_hash, rol, activo) VALUES (?, ?, 1, 0)";
-        String sql = "INSERT INTO usuario (nombre_usuario, contrasena_hash, rol, activo) VALUES (?, SHA2(?, 256), 1, 0)";
+        String sql = "INSERT INTO usuario (nombre_usuario, contrasena_hash, rol, activo) VALUES (?, SHA2(?, 256), 1, 1)";
         
         // Usa try-with-resources para que Java cierre los recursos automáticamente
         try (Connection conn = Conexion.getConexion(); PreparedStatement ps = conn.prepareStatement(sql)) {
