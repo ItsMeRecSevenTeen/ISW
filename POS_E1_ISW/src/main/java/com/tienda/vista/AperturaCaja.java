@@ -7,7 +7,10 @@ import com.tienda.dao.TurnoCajaDAO;
 import com.tienda.dao.UsuarioDAO;
 import com.tienda.util.Sesion;
 import javax.swing.JOptionPane;
-
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.DocumentFilter;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 public class AperturaCaja extends javax.swing.JPanel {
     UsuarioDAO usuarioDao = new UsuarioDAO();
     public AperturaCaja() {
@@ -33,7 +36,30 @@ public class AperturaCaja extends javax.swing.JPanel {
 
         // Escribir el nombre de la sesión actual
         jLabel1.setText(cajeroActual);
+        ((AbstractDocument) jTextField1.getDocument()).setDocumentFilter(new DocumentFilter() {
+            @Override
+            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+                String currentText = fb.getDocument().getText(0, fb.getDocument().getLength());
+                String nextText = currentText.substring(0, offset) + string + currentText.substring(offset);
+
+                // ER para números a 2 decimales
+                if (nextText.matches("^\\d*(\\.\\d{0,2})?$")) {
+                    super.insertString(fb, offset, string, attr);
+                }
+            }
+
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                String currentText = fb.getDocument().getText(0, fb.getDocument().getLength());
+                String nextText = currentText.substring(0, offset) + text + currentText.substring(offset + length);
+
+                if (nextText.matches("^\\d*(\\.\\d{0,2})?$")) {
+                    super.replace(fb, offset, length, text, attrs);
+                }
+            }
+        });
     }
+    
 
     @SuppressWarnings("unchecked")
  
