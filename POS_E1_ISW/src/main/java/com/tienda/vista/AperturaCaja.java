@@ -128,12 +128,12 @@ public class AperturaCaja extends javax.swing.JPanel {
             
             // Si después de abrir la caja quieres mandar al usuario a otra pantalla,
             // puedes replicar aquí tu lógica de intercambio de páneles, por ejemplo:
-            /*
+            
             MainFrame framePrincipal = (MainFrame) javax.swing.SwingUtilities.getWindowAncestor(this);
             if (framePrincipal != null) {
-                framePrincipal.cambiarPanel(new MenuPrincipalPanel());
+                framePrincipal.cambiarPanel(new VentasPanel());
             }
-            */
+            
             
         } catch (NumberFormatException e) {
             // Se activa si el usuario introduce letras o caracteres especiales inválidos
