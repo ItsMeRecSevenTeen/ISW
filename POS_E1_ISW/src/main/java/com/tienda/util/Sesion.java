@@ -10,6 +10,7 @@ package com.tienda.util;
  */
 public class Sesion {
     private static Sesion instancia;
+    private int idCajero; // Para guardar el ID de la base de datos
     private String nombreUsuario;
     private int rol; // Por si se necesita que admin o cajero lo use
 
@@ -23,7 +24,8 @@ public class Sesion {
         }
         return instancia;
     }
-
+    public int getIdCajero() { return idCajero; }
+    public void setIdCajero(int idCajero) { this.idCajero = idCajero; }
     // Getters y Setters
     public String getNombreUsuario() { return nombreUsuario; }
     public void setNombreUsuario(String nombreUsuario) { this.nombreUsuario = nombreUsuario; }
