@@ -58,6 +58,7 @@ public class AperturaCaja extends javax.swing.JPanel {
                 }
             }
         });
+        jTextField1.requestFocus();
     }
     
 
@@ -145,22 +146,20 @@ public class AperturaCaja extends javax.swing.JPanel {
                 return;
             }
             
-            // 4. Instanciar tu clase DAO e intentar registrar en la base de datos
+            // Recuperars el ID del cajero desde la sesión global
+            int idLogueado = com.tienda.util.Sesion.getInstancia().getIdCajero();
+            System.out.println("DEBUG - ID del cajero enviado: " + idLogueado); //Depuración
+            // Instanciado del DAO y se le pasa ambos datos
             TurnoCajaDAO turnoDAO = new TurnoCajaDAO();
-            turnoDAO.registrarApertura(monto);
-            
-            // 5. Opcional: Limpiar el campo tras un registro exitoso
+            turnoDAO.registrarApertura(monto, idLogueado);
+
+            // Limpiar campo
             jTextField1.setText("");
-            
-            // Si después de abrir la caja quieres mandar al usuario a otra pantalla,
-            // puedes replicar aquí tu lógica de intercambio de páneles, por ejemplo:
             
             MainFrame framePrincipal = (MainFrame) javax.swing.SwingUtilities.getWindowAncestor(this);
             if (framePrincipal != null) {
                 framePrincipal.cambiarPanel(new VentasPanel());
-            }
-            
-            
+            }            
         } catch (NumberFormatException e) {
             // Se activa si el usuario introduce letras o caracteres especiales inválidos
             JOptionPane.showMessageDialog(this, 
