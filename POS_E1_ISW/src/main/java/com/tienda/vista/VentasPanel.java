@@ -190,11 +190,11 @@ private final double[] precios = {
 
         jButton1.setText("jButton1");
         jButton1.addActionListener(this::jButton1ActionPerformed);
-        add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 30, 30));
+        add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 70, 30));
 
         jTextField1.setText("Buscar");
         jTextField1.addActionListener(this::jTextField1ActionPerformed);
-        add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 10, 320, 30));
+        add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 10, 810, 30));
         add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 210, -1, -1));
 
         jPanel1.setBackground(new java.awt.Color(250, 247, 251));
@@ -216,21 +216,21 @@ private final double[] precios = {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(302, Short.MAX_VALUE)
+                .addContainerGap(602, Short.MAX_VALUE)
                 .addComponent(BotonTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
-        add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 10, 160, 360));
+        add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1010, 60, 160, 660));
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         jScrollPane2.setViewportView(jPanel2);
 
-        add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 420, 310));
+        add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 980, 660));
 
         jTextField2.setText("jTextField2");
-        add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 10, 50, 30));
+        add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 10, 50, 30));
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
