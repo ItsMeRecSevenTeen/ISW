@@ -64,12 +64,13 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
         aceptar = new javax.swing.JButton();
         generarSku = new javax.swing.JButton();
         stockMinimo1 = new javax.swing.JTextField();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        SKUgen = new javax.swing.JTextPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setBounds(new java.awt.Rectangle(0, 30, 505, 500));
         setMinimumSize(new java.awt.Dimension(500, 500));
         setName("nuevoProducto"); // NOI18N
-        setPreferredSize(new java.awt.Dimension(505, 500));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         tipoProducto.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Refrescos", "Frituras", "Lacteos", "Dulces" }));
@@ -80,21 +81,27 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
         agregarTipo.addActionListener(this::agregarTipoActionPerformed);
         getContentPane().add(agregarTipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 60, -1, -1));
 
+        precioCompra.setText("Precio de compra");
         precioCompra.addActionListener(this::precioCompraActionPerformed);
         getContentPane().add(precioCompra, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 220, 150, -1));
 
+        precio.setText("Precio");
         precio.addActionListener(this::precioActionPerformed);
         getContentPane().add(precio, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 100, 150, -1));
 
+        stock.setText("Stock");
         stock.addActionListener(this::stockActionPerformed);
         getContentPane().add(stock, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 180, 150, -1));
 
+        tamano.setText("Tamaño");
         tamano.addActionListener(this::tamanoActionPerformed);
         getContentPane().add(tamano, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 180, 150, -1));
 
+        nombre.setText("Nombre del producto");
         nombre.addActionListener(this::nombreActionPerformed);
         getContentPane().add(nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, 150, -1));
 
+        marca.setText("Marca");
         marca.addActionListener(this::marcaActionPerformed);
         getContentPane().add(marca, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 140, 150, -1));
 
@@ -103,18 +110,23 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
 
         jLabel3.setFont(new java.awt.Font("Helvetica", 1, 18)); // NOI18N
         jLabel3.setText("Código de barras");
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 240, -1, -1));
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 260, -1, -1));
 
         aceptar.setText("Aceptar");
         aceptar.addActionListener(this::aceptarActionPerformed);
-        getContentPane().add(aceptar, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 290, -1, -1));
+        getContentPane().add(aceptar, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 350, -1, -1));
 
         generarSku.setText("Generar SKU");
         generarSku.addActionListener(this::generarSkuActionPerformed);
         getContentPane().add(generarSku, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 210, -1, -1));
 
+        stockMinimo1.setText("Stock mínimo");
         stockMinimo1.addActionListener(this::stockMinimo1ActionPerformed);
         getContentPane().add(stockMinimo1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 140, 150, -1));
+
+        jScrollPane1.setViewportView(SKUgen);
+
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 240, 150, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -222,25 +234,28 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_aceptarActionPerformed
 
     private void generarSkuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generarSkuActionPerformed
-       javax.swing.JLabel lblSkuGenerado = new javax.swing.JLabel("  SKU Generado:");
-    javax.swing.JLabel txtSkuResultado = new javax.swing.JLabel("---"); 
-    txtSkuResultado.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 14));
-    
-    java.awt.event.KeyAdapter skuListener = new java.awt.event.KeyAdapter() {
-        @Override
-        public void keyReleased(java.awt.event.KeyEvent e) {
-            // Instanciamos el DAO de configuración para usar su método
-            com.tienda.dao.ConfiguracionDAO configDAO = new com.tienda.dao.ConfiguracionDAO();
-            
-            String sku = configDAO.generarSKU(nombre.getText(), marca.getText(), tamano.getText() );
-            
-            // Lo pintamos en la interfaz
-            txtSkuResultado.setText(sku);
-        }
-    };
-   nombre.addKeyListener(skuListener);
-  marca.addKeyListener(skuListener);
-    tamano.addKeyListener(skuListener);
+String txtNombre = nombre.getText().trim();
+    String txtMarca = marca.getText().trim();
+    String txtTamano = tamano.getText().trim();
+
+    // Validar que los campos no estén vacíos para evitar errores
+    if (txtNombre.isEmpty() || txtMarca.isEmpty() || txtTamano.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Por favor, llena todos los campos para generar el SKU.", "Campos vacíos", JOptionPane.WARNING_MESSAGE);
+        return; // Sale del método si falta información
+    }
+
+    // 2. Lógica para construir el SKU (Tomamos subcadenas para que no quede un texto gigante)
+    // Ejemplo: Nombre "Arroz" -> "ARR", Marca "Costeña" -> "CO", Tamaño "1kg" -> "1KG"
+    String parteNombre = (txtNombre.length() >= 3) ? txtNombre.substring(0, 3) : txtNombre;
+    String parteMarca = (txtMarca.length() >= 2) ? txtMarca.substring(0, 2) : txtMarca;
+    // Eliminamos espacios intermedios en el tamaño por si escriben "100 gr"
+    String parteTamano = txtTamano.replace(" ", ""); 
+
+    // 3. Concatenar y convertir a mayúsculas (sin guiones)
+    String SKU = (parteNombre + parteMarca + parteTamano).toUpperCase();
+
+    // 4. Mostrar el SKU en pantalla
+    SKUgen.setText(SKU);
     }//GEN-LAST:event_generarSkuActionPerformed
 
     private void stockMinimo1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stockMinimo1ActionPerformed
@@ -285,11 +300,13 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextPane SKUgen;
     private javax.swing.JButton aceptar;
     private javax.swing.JButton agregarTipo;
     private javax.swing.JButton generarSku;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField marca;
     private javax.swing.JTextField nombre;
     private javax.swing.JTextField precio;

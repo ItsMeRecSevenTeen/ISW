@@ -119,7 +119,56 @@ public class AperturaCaja extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    String textoMonto = jTextField1.getText().trim();
         
+        // 2. Validar que el usuario haya ingresado un valor
+        if (textoMonto.isEmpty()) {
+            JOptionPane.showMessageDialog(this, 
+                    "Por favor, ingrese el monto de efectivo para realizar la apertura.", 
+                    "Monto Requerido", 
+                    JOptionPane.WARNING_MESSAGE);
+            jTextField1.requestFocus();
+            return;
+        }
+        
+        try {
+            // 3. Convertir el texto a un formato numérico válido (double)
+            double monto = Double.parseDouble(textoMonto);
+            
+            // Validar que no ingresen valores negativos
+            if (monto < 0) {
+                JOptionPane.showMessageDialog(this, 
+                        "El monto de apertura no puede ser un valor negativo.", 
+                        "Monto Inválido", 
+                        JOptionPane.ERROR_MESSAGE);
+                jTextField1.requestFocus();
+                return;
+            }
+            
+            // 4. Instanciar tu clase DAO e intentar registrar en la base de datos
+            TurnoCajaDAO turnoDAO = new TurnoCajaDAO();
+            turnoDAO.registrarApertura(monto);
+            
+            // 5. Opcional: Limpiar el campo tras un registro exitoso
+            jTextField1.setText("");
+            
+            // Si después de abrir la caja quieres mandar al usuario a otra pantalla,
+            // puedes replicar aquí tu lógica de intercambio de páneles, por ejemplo:
+            
+            MainFrame framePrincipal = (MainFrame) javax.swing.SwingUtilities.getWindowAncestor(this);
+            if (framePrincipal != null) {
+                framePrincipal.cambiarPanel(new VentasPanel());
+            }
+            
+            
+        } catch (NumberFormatException e) {
+            // Se activa si el usuario introduce letras o caracteres especiales inválidos
+            JOptionPane.showMessageDialog(this, 
+                    "El monto ingresado no es válido. Use únicamente números y punto decimal.", 
+                    "Error de Formato", 
+                    JOptionPane.ERROR_MESSAGE);
+            jTextField1.requestFocus();
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
