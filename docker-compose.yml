@@ -6,6 +6,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root_password_isw # La contraseña de la DB para el Equipo
       MYSQL_DATABASE: db_isw # Nombre de la base de datos
+      TZ: "America/Mexico_City" # Zona Horaria correcta
     ports:
       - "3306:3306" # Ruteo del puerto 3306 del contenedor al 3306 de la PC anfitriona
     volumes:
