@@ -18,7 +18,7 @@ import java.sql.SQLException;
 
 public class UsuarioDAO {
     public int autenticar(String usuario, String password) {
-        String sql = "SELECT rol FROM usuario WHERE nombre_usuario = ? AND contrasena_hash = SHA2(?, 256) AND activo = true";
+        String sql = "SELECT id_usuario, rol FROM usuario WHERE nombre_usuario = ? AND contrasena_hash = SHA2(?, 256) AND activo = true";
         //try-with-resources para que Java cierre los recursos automáticamente
         try (Connection conn = Conexion.getConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -27,7 +27,16 @@ public class UsuarioDAO {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt("rol"); // Retorna 0 (Admin) o 1 (Cajero)
+                    // 2. Extraemos AMBOS valores de la base de datos
+                int idUsuarioReal = rs.getInt("id_usuario");
+                int rolReal = rs.getInt("rol"); //Retorna 0 = admin y 1 = cajero
+                
+                // Estableciendo las variables para el singleton de una vez
+                com.tienda.util.Sesion.getInstancia().setIdCajero(idUsuarioReal);
+                com.tienda.util.Sesion.getInstancia().setNombreUsuario(usuario);
+                com.tienda.util.Sesion.getInstancia().setRol(rolReal);
+                
+                return rolReal;//Regresando el valor del rol
                 }
                 return -1; // Credenciales incorrectas o usuario inactivo
             }
