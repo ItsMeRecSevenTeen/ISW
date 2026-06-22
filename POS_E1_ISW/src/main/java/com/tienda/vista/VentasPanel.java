@@ -4,30 +4,64 @@
  */
 package com.tienda.vista;
 
+import com.tienda.dao.ProductoDAO;
+import com.tienda.modelo.Producto;
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
+import com.tienda.util.Sesion;
+import java.awt.Component;
 
 public class VentasPanel extends javax.swing.JPanel {
-private final double[] precios = {
-        15.50, 22.00, 45.00, 28.50, 42.00,
-        20.00, 35.00, 18.00, 14.50, 17.00
-    };
-    
     private double costoTotal = 0.0;
     private JPanel panelListaProductos;
     private Map<String, FilaProducto> productosAgregados = new HashMap<>();
 
     public VentasPanel() {
         initComponents();
+        
+        // Crea el menú flotante
+        JPopupMenu menuUsuario = new JPopupMenu();
+
+        //Crea la opción de cerrar sesión
+        JMenuItem itemCerrarSesion = new JMenuItem("Cerrar caja");
+        
+        itemCerrarSesion.addActionListener(e -> {
+            MainFrame framePrincipal = (MainFrame) javax.swing.SwingUtilities.getWindowAncestor(this);
+            if (framePrincipal != null) {
+                // Instanciar el nuevo panel del Login de Administrador
+                CierreCaja cierreCaja = new CierreCaja(); //Para cada ventana, cambiar su constructor
+
+                // Mandar a hacer el intercambio
+                framePrincipal.cambiarPanel(cierreCaja);
+            }
+        });
+        // Agregar el evento de clic al ícono de administrador
+        jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                // .show(componente_origen, coordenada_X, coordenada_Y)
+                // X en 0 y Y justo al final de la altura del ícono para cuadrarlo bien
+                menuUsuario.show(jLabel1, 0, jLabel1.getHeight());
+            }
+        });
+        // Meter el ítem al menú
+        menuUsuario.add(itemCerrarSesion);
+        
         configurarPanel1();
+        jLabel1.putClientProperty("FlatLaf.style", "font: 20 'DearSans-Book'");
+        jLabel1.setText("<html><body style='margin-top: 2px;'>" + Sesion.getInstancia().getNombreUsuario() + "</body></html>");
+        
+        jLabel1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/user.svg", (float) 1.0));
+        jTextField1.putClientProperty("JTextField.placeholderText", "Buscar por SKU o Código de Barras");
         cargarBotonesDinamicos();
     }
-
+    
+    
     private void configurarPanel1() {
         jPanel1.setLayout(new BorderLayout());
-        jPanel1.setPreferredSize(new Dimension(160, 360));
+        jPanel1.setPreferredSize(new Dimension(240, 360));
 
         panelListaProductos = new JPanel();
         panelListaProductos.setLayout(new BoxLayout(panelListaProductos, BoxLayout.Y_AXIS));
@@ -40,27 +74,31 @@ private final double[] precios = {
 
         actualizarBotonTotal();
     }
+    
 
     private void cargarBotonesDinamicos() {
-        String[] productos = {
-            "Arroz", "Frijol", "Aceite", "Leche", "Huevo",
-            "Azúcar", "Café", "Atún", "Jabón", "Refresco"
-        };
-
         JPanel panelContenedor = new JPanel(new GridLayout(0, 4, 5, 5));
 
-        for (int i = 0; i < productos.length; i++) {
-            String nombreProducto = productos[i];
-            double precioProducto = precios[i];
+        // 1. Llamamos a la base de datos mediante el DAO
+        com.tienda.dao.ProductoDAO prodDAO = new com.tienda.dao.ProductoDAO();
+        java.util.List<com.tienda.modelo.Producto> catalogo = prodDAO.obtenerCatalogoVentas();
 
-            JButton boton = new JButton(nombreProducto);
+        // 2. Iteramos sobre los productos reales
+        for (com.tienda.modelo.Producto prod : catalogo) {
+            String nombreProducto = prod.getNombre();
+            double precioProducto = prod.getPrecioVenta();
+
+            // Diseño del botón
+            // Usamos HTML simple para que el nombre se divida en dos líneas si es muy largo
+            JButton boton = new JButton("<html><center>" + nombreProducto + "</center></html>");
             Dimension dimensionBoton = new Dimension(90, 90);
             boton.setPreferredSize(dimensionBoton);
             boton.setMinimumSize(dimensionBoton);
             boton.setMaximumSize(dimensionBoton);
-            boton.setFont(new Font("Arial", Font.BOLD, 11));
+            boton.setFont(new Font("Arial", Font.BOLD, 10)); // Bajé un poco la fuente por si hay nombres largos
             boton.setMargin(new Insets(2, 2, 2, 2));
 
+            // Mantenemos tu lógica intacta para agregar al carrito
             boton.addActionListener(e -> agregarOIncrementarProducto(nombreProducto, precioProducto));
 
             panelContenedor.add(boton);
@@ -89,6 +127,36 @@ private final double[] precios = {
         panelListaProductos.repaint();
     }
 
+    private void agregarProductoAlTicket(Producto prod) {
+    String nombre = prod.getNombre();
+
+    // CASO A: El producto YA está en el mapa (containsKey sustituye a contains)
+    if (productosAgregados.containsKey(nombre)) {
+        // ¡Magia del Map! Obtenemos la fila directamente sin usar ningún ciclo FOR
+        FilaProducto fila = productosAgregados.get(nombre);
+        
+        int valorActual = (int) fila.spinnerCantidad.getValue();
+        fila.spinnerCantidad.setValue(valorActual + 1); 
+        // Esto ya dispara el ChangeListener que recalcula el total solo
+    } 
+    // CASO B: Es la primera vez que se escanea el producto
+    else {
+        FilaProducto nuevaFila = new FilaProducto(nombre, prod.getPrecioVenta());
+        panelListaProductos.add(nuevaFila);
+
+        // Guardamos en el mapa: la llave es el 'nombre' y el valor es la 'nuevaFila'
+        // (put sustituye a add)
+        productosAgregados.put(nombre, nuevaFila);
+
+        // Sumamos al costo total global
+        costoTotal += prod.getPrecioVenta();
+        actualizarBotonTotal();
+
+        // Refrescamos la interfaz
+        panelListaProductos.revalidate();
+        panelListaProductos.repaint();
+    }
+}
     private void actualizarBotonTotal() {
         BotonTotal.setText("TOTAL: $" + String.format("%.2f", costoTotal));
     }
@@ -97,6 +165,7 @@ private final double[] precios = {
      * Clase interna rediseñada para centrar elementos y agrandar el Spinner
      */
     private class FilaProducto extends JPanel {
+
         private JSpinner spinnerCantidad;
         private JLabel lblPrecio;
         private double precioUnitario;
@@ -106,58 +175,62 @@ private final double[] precios = {
         public FilaProducto(String nombre, double precio) {
             this.nombreProd = nombre;
             this.precioUnitario = precio;
-            
-            // Usamos GridBagLayout para centrar perfectamente todo el renglón
+
             this.setLayout(new GridBagLayout());
-            this.setMaximumSize(new Dimension(160, 40)); 
-            this.setBorder(BorderFactory.createEmptyBorder(4, 2, 4, 2)); // Margen interno de la fila
+
+            // SOLUCIÓN AL GAP (Rojo): Permitimos que la fila se expanda al ancho total disponible, manteniendo 42px de alto
+            this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
+            this.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6)); // Margen interno de la fila
 
             GridBagConstraints gbc = new GridBagConstraints();
-            gbc.insets = new Insets(0, 3, 0, 3); // Espaciado horizontal entre componentes
-            gbc.fill = GridBagConstraints.NONE;
-            gbc.anchor = GridBagConstraints.CENTER; // Clave para centrar
+            gbc.insets = new Insets(0, 4, 0, 4); // Espaciado entre elementos internos
 
-            // 1. Label de Nombre
+            // 1. Label de Nombre: Se queda con todo el espacio sobrante de la izquierda
             JLabel lblNombre = new JLabel(nombre);
             lblNombre.setFont(new Font("Arial", Font.BOLD, 11));
             gbc.gridx = 0;
+            gbc.weightx = 1.0; // <-- CLAVE: Absorbe todo el ancho libre y empuja al resto a la derecha
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.anchor = GridBagConstraints.WEST; // Alineado a la izquierda
             this.add(lblNombre, gbc);
 
-            // 2. Configurar Spinner más grande
+            // Configurar Spinner
             SpinnerNumberModel modelo = new SpinnerNumberModel(1, 0, 99, 1);
             spinnerCantidad = new JSpinner(modelo);
-            
-            // Incrementamos dimensiones para que no se corten los números ni las flechas
-            Dimension dimSpinner = new Dimension(55, 26);
+            Dimension dimSpinner = new Dimension(52, 26);
             spinnerCantidad.setPreferredSize(dimSpinner);
             spinnerCantidad.setMinimumSize(dimSpinner);
-            
-            // Agrandar la fuente interna del número en el spinner
+            spinnerCantidad.setMaximumSize(dimSpinner);
+
             JComponent editor = spinnerCantidad.getEditor();
             if (editor instanceof JSpinner.DefaultEditor) {
                 JFormattedTextField txtField = ((JSpinner.DefaultEditor) editor).getTextField();
                 txtField.setFont(new Font("Arial", Font.PLAIN, 12));
-                txtField.setHorizontalAlignment(JTextField.CENTER); // Centra el número en su cajita
+                txtField.setHorizontalAlignment(JTextField.CENTER);
             }
 
             gbc.gridx = 1;
+            gbc.weightx = 0.0; // Ancho fijo, no se deforma
+            gbc.fill = GridBagConstraints.NONE;
+            gbc.anchor = GridBagConstraints.CENTER;
             this.add(spinnerCantidad, gbc);
-            
-            // 3. Label de Precio
+
+            // Label de Precio SOLUCIÓN AL RECORTE
             lblPrecio = new JLabel("$" + String.format("%.2f", precio));
             lblPrecio.setFont(new Font("Arial", Font.PLAIN, 11));
             gbc.gridx = 2;
+            gbc.weightx = 0.0; // Ancho fijo
+            gbc.fill = GridBagConstraints.NONE;
+            gbc.anchor = GridBagConstraints.EAST; // Alineado perfectamente a la derecha
             this.add(lblPrecio, gbc);
 
-            // Listener del Spinner
+            // El listener el Spinner se queda exactamente igual abajo...
             spinnerCantidad.addChangeListener(e -> {
                 int nuevaCantidad = (int) spinnerCantidad.getValue();
-                
                 if (nuevaCantidad == 0) {
                     costoTotal -= precioUnitario;
                     panelListaProductos.remove(this);
                     productosAgregados.remove(nombreProd);
-                    
                     panelListaProductos.revalidate();
                     panelListaProductos.repaint();
                 } else {
@@ -170,75 +243,70 @@ private final double[] precios = {
             });
         }
     }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton1 = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
         jSeparator1 = new javax.swing.JSeparator();
         jPanel1 = new javax.swing.JPanel();
         BotonTotal = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         jPanel2 = new javax.swing.JPanel();
-        jTextField2 = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jButton1.setText("jButton1");
-        jButton1.addActionListener(this::jButton1ActionPerformed);
-        add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 70, 30));
-
-        jTextField1.setText("Buscar");
         jTextField1.addActionListener(this::jTextField1ActionPerformed);
-        add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 10, 810, 30));
+        add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 10, 640, 30));
         add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 210, -1, -1));
 
         jPanel1.setBackground(new java.awt.Color(250, 247, 251));
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         BotonTotal.setBackground(new java.awt.Color(71, 210, 165));
         BotonTotal.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         BotonTotal.addActionListener(this::BotonTotalActionPerformed);
+        jPanel1.add(BotonTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 600, 220, 48));
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(BotonTotal, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(602, Short.MAX_VALUE)
-                .addComponent(BotonTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-
-        add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1010, 60, 160, 660));
+        add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 60, 270, 660));
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         jScrollPane2.setViewportView(jPanel2);
 
-        add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 980, 660));
+        add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 880, 660));
 
-        jTextField2.setText("jTextField2");
-        add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 10, 50, 30));
+        jLabel1.setText("jLabel1");
+        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 10, -1, -1));
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
-
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        // TODO add your handling code here:
+        // Captura lo que el escáner acaba de leer
+    String skuEscaneado = jTextField1.getText().trim();
+
+    if (!skuEscaneado.isEmpty()) {
+        // Buscar el producto en la BD
+        ProductoDAO dao = new ProductoDAO();
+        Producto productoEncontrado = dao.buscarPorSKUOBarra(skuEscaneado);
+
+        if (productoEncontrado != null) {
+            //  Si existe, mandarlo al panel
+            agregarProductoAlTicket(productoEncontrado);
+        } else {
+            // El producto no existe o está mal registrado
+            JOptionPane.showMessageDialog(this, "Producto no encontrado: " + skuEscaneado, "Aviso", JOptionPane.WARNING_MESSAGE);
+        }
+
+        // PREPARACIÓN PARA EL SIGUIENTE ESCANEO (¡Crucial!)
+        jTextField1.setText(""); // Limpiamos el texto
+        jTextField1.requestFocus(); // Obligamos al cursor a quedarse parpadeando ahí
+    }
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void BotonTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonTotalActionPerformed
@@ -248,12 +316,11 @@ private final double[] precios = {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BotonTotal;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
     // End of variables declaration//GEN-END:variables
 }
