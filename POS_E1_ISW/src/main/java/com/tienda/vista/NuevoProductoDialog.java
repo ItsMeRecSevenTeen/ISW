@@ -5,7 +5,12 @@
 package com.tienda.vista;
 
 import com.tienda.dao.ConfiguracionDAO;
+import com.tienda.vista.InventarioPanel;
 import javax.swing.JOptionPane;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 
 /**
  *
@@ -18,9 +23,34 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
     /**
      * Creates new form NuevoProductoDialog
      */
-    public NuevoProductoDialog(java.awt.Frame parent, boolean modal) {
+    // Conexión continua con el panel de inventario
+    private InventarioPanel panelInventario;
+    
+    public NuevoProductoDialog(java.awt.Frame parent, boolean modal, InventarioPanel panelInventario) {
         super(parent, modal);
         initComponents();
+        this.panelInventario = panelInventario;
+
+        // --- SECCIÓN DE HARDENING CON LÍMITES DE BASE DE DATOS ---
+    
+    // 1. Filtros para Dinero y Stocks (decimal(10,2) -> Máximo 10 caracteres incluyendo el punto, ej: 9999999.99)
+    String regexDecimal = "^\\d*(\\.\\d{0,2})?$";
+    sanitizarCampo(CodigoBarras, "^[a-zA-Z0-9]*$", 20); //Hardening ligero para el código de barras
+    sanitizarCampo(precio, regexDecimal, 10);
+    sanitizarCampo(precioCompra, regexDecimal, 10);
+    sanitizarCampo(stock, regexDecimal, 10);
+    sanitizarCampo(stockMinimo1, regexDecimal, 10);
+    
+    
+    // 2. Filtros para Campos de Texto (Mapeados con los VARCHAR de tu tabla)
+    String regexTextoSeguro = "^[a-zA-Z0-9áéíóúñÁÉÍÓÚÑ\\s\\-_\\.]*$";
+    sanitizarCampo(nombre, regexTextoSeguro, 100); // varchar(100) en la BD
+    sanitizarCampo(marca, regexTextoSeguro, 50);    // varchar(50) en la BD
+    
+    // 3. Filtro para Tamaño / Contenido Neto (Mapeado con contenido_neto)
+    String regexTamano = "^[a-zA-Z0-9\\s\\.]*$";
+    sanitizarCampo(tamano, regexTamano, 50);       // varchar(50) en la BD
+
         jLabel2.putClientProperty("FlatLaf.style", "font: 19 'DearSans-Book'");
         nombre.putClientProperty("JTextField.placeholderText", "Nombre del producto");
         marca.putClientProperty("JTextField.placeholderText", "Marca");
@@ -30,7 +60,7 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
         stock.putClientProperty("JTextField.placeholderText", "Stock");
         tamano.putClientProperty("JTextField.placeholderText", "Tamaño");
         aceptar.putClientProperty("FlatLaf.style", "font: 15 'DearSans-Book'");
-        aceptar.setText("<html><body style='margin-top: 2px;'>aceptar</body></html>");
+        aceptar.setText("<html><body style='margin-top: 2px;'>Aceptar</body></html>");
  
         jLabel3.putClientProperty("FlatLaf.style", "font: 19 'DearSans-Book'");
         
@@ -40,8 +70,52 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
         setLocationRelativeTo(parent);
          String Tamano=tamano.getText();    
     }
+    private void limpiarFormulario() {
+    nombre.setText("");
+    marca.setText("");
+    tamano.setText("");
+    precioCompra.setText("");
+    precio.setText("");
+    stock.setText("");
+    stockMinimo1.setText("");
     
+    // Reseteamos el SKU a su estado inicial
+    SKUgen.setText("---"); 
+    
+    // Si tu combo de tipo de producto tiene elementos, puedes regresarlo al primero:
+    if (tipoProducto.getItemCount() > 0) {
+        tipoProducto.setSelectedIndex(0);
+    }
+    
+    // Ponemos el foco del teclado de nuevo en el primer campo para comodidad del usuario
+    nombre.requestFocus(); 
+}
+private void sanitizarCampo(javax.swing.JTextField campo, String regex, int maxLongitud) {
+    ((javax.swing.text.AbstractDocument) campo.getDocument()).setDocumentFilter(new javax.swing.text.DocumentFilter() {
+        @Override
+        public void insertString(FilterBypass fb, int offset, String string, javax.swing.text.AttributeSet attr) throws javax.swing.text.BadLocationException {
+            String currentText = fb.getDocument().getText(0, fb.getDocument().getLength());
+            String nextText = currentText.substring(0, offset) + string + currentText.substring(offset);
 
+            // Valida el formato Y que no exceda el tamaño de la base de datos
+            if (nextText.matches(regex) && nextText.length() <= maxLongitud) {
+                super.insertString(fb, offset, string, attr);
+            }
+        }
+
+        @Override
+        public void replace(FilterBypass fb, int offset, int length, String text, javax.swing.text.AttributeSet attrs) throws javax.swing.text.BadLocationException {
+            String currentText = fb.getDocument().getText(0, fb.getDocument().getLength());
+            String nextText = currentText.substring(0, offset) + text + currentText.substring(offset + length);
+
+            // Valida el formato Y que no exceda el tamaño de la base de datos
+            if (nextText.matches(regex) && nextText.length() <= maxLongitud) {
+                super.replace(fb, offset, length, text, attrs);
+            }
+        }
+    });
+}
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -66,6 +140,7 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
         stockMinimo1 = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         SKUgen = new javax.swing.JTextPane();
+        CodigoBarras = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setBounds(new java.awt.Rectangle(0, 30, 505, 500));
@@ -75,58 +150,52 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
 
         tipoProducto.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Refrescos", "Frituras", "Lacteos", "Dulces" }));
         tipoProducto.addActionListener(this::tipoProductoActionPerformed);
-        getContentPane().add(tipoProducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 60, 120, -1));
+        getContentPane().add(tipoProducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, 120, -1));
 
         agregarTipo.setText("Agregar tipo +");
         agregarTipo.addActionListener(this::agregarTipoActionPerformed);
-        getContentPane().add(agregarTipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 60, -1, -1));
+        getContentPane().add(agregarTipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 60, -1, -1));
 
-        precioCompra.setText("Precio de compra");
         precioCompra.addActionListener(this::precioCompraActionPerformed);
-        getContentPane().add(precioCompra, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 220, 150, -1));
+        getContentPane().add(precioCompra, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 260, 150, -1));
 
-        precio.setText("Precio");
         precio.addActionListener(this::precioActionPerformed);
-        getContentPane().add(precio, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 100, 150, -1));
+        getContentPane().add(precio, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 110, 150, -1));
 
-        stock.setText("Stock");
         stock.addActionListener(this::stockActionPerformed);
-        getContentPane().add(stock, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 180, 150, -1));
+        getContentPane().add(stock, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 160, 150, -1));
 
-        tamano.setText("Tamaño");
         tamano.addActionListener(this::tamanoActionPerformed);
-        getContentPane().add(tamano, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 180, 150, -1));
+        getContentPane().add(tamano, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 160, 150, -1));
 
-        nombre.setText("Nombre del producto");
         nombre.addActionListener(this::nombreActionPerformed);
-        getContentPane().add(nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, 150, -1));
+        getContentPane().add(nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, 150, -1));
 
-        marca.setText("Marca");
         marca.addActionListener(this::marcaActionPerformed);
-        getContentPane().add(marca, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 140, 150, -1));
+        getContentPane().add(marca, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 210, 150, -1));
 
         jLabel2.setText("Tipo de producto");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 30, 200, -1));
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 30, 170, -1));
 
         jLabel3.setFont(new java.awt.Font("Helvetica", 1, 18)); // NOI18N
         jLabel3.setText("Código de barras");
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 260, -1, -1));
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 350, 170, -1));
 
-        aceptar.setText("Aceptar");
         aceptar.addActionListener(this::aceptarActionPerformed);
-        getContentPane().add(aceptar, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 350, -1, -1));
+        getContentPane().add(aceptar, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 400, -1, 30));
 
         generarSku.setText("Generar SKU");
         generarSku.addActionListener(this::generarSkuActionPerformed);
-        getContentPane().add(generarSku, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 210, -1, -1));
+        getContentPane().add(generarSku, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 300, -1, -1));
 
-        stockMinimo1.setText("Stock mínimo");
         stockMinimo1.addActionListener(this::stockMinimo1ActionPerformed);
-        getContentPane().add(stockMinimo1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 140, 150, -1));
+        getContentPane().add(stockMinimo1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 210, 150, -1));
 
+        SKUgen.setEditable(false);
         jScrollPane1.setViewportView(SKUgen);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 240, 150, -1));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 260, 150, -1));
+        getContentPane().add(CodigoBarras, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 350, 140, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -178,59 +247,57 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_tipoProductoActionPerformed
 
     private void aceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aceptarActionPerformed
-      /* if (nombre.getText().trim().isEmpty() || marca.getText().trim().isEmpty() || tamano.getText().trim().isEmpty()) {
-            javax.swing.JOptionPane.showMessageDialog(this,
-                    "Los campos Nombre, Marca y Tamaño son requeridos.",
-                    "Campos faltantes", javax.swing.JOptionPane.WARNING_MESSAGE);
+        // --- VALIDACIONES DE CAMPOS VACÍOS ---
+        if (nombre.getText().trim().isEmpty() || marca.getText().trim().isEmpty()
+                || tamano.getText().trim().isEmpty() || precioCompra.getText().trim().isEmpty()
+                || precio.getText().trim().isEmpty() || stock.getText().trim().isEmpty()
+                || stockMinimo1.getText().trim().isEmpty()
+                || CodigoBarras.getText().trim().isEmpty()) {
+
+            javax.swing.JOptionPane.showMessageDialog(this, "Todos los campos son requeridos, incluyendo el Código de Barras.", "Campos vacíos", javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
-        try {
-            String tipoProd = JOptionPane.showInputDialog("ingresa un nuevo tipo de producto: ");
-            tipoProducto.addItem(tipoProd);
-            String Tamano = tamano.getText();
-            try {
-                String PrecioCompra = precioCompra.getText();
-                double preciodouble = Double.parseDouble(PrecioCompra);
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "ingresar un número valido");
-            }
-            try {
-                String Precio = precio.getText();
-                double preciodouble2 = Double.parseDouble(Precio);
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "ingresar un número valido");
-            }
-            try {
-                String Precio = precioCompra.getText();
-                double preciodouble3 = Double.parseDouble(Precio);
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "ingresar un número valido");
-            }
-            String NombreP = nombre.getText();
-            String productType = tipoProducto.getSelectedItem().toString();
-         
-            String sku = txtSkuResultado.getText().trim();
-            if (sku.equals("---") || sku.isEmpty()) {
-                javax.swing.JOptionPane.showMessageDialog(this, "El SKU no se ha generado correctamente.", "Error de SKU", javax.swing.JOptionPane.ERROR_MESSAGE);
-                
-                return;
-            }
-            com.tienda.dao.ProductoDAO prodDAO=new com.tienda.dao.ProductoDAO();
-            boolean guardadoExitoso=prodDAO.guardarProducto(tipoProducto, nombre, marca, tamano, precioCompra, precio, stock, stockMinimo1);
-            if(guardadoExitoso){
-                javax.swing.JOptionPane.showMessageDialog(this, "¡Producto registrado y guardado correctamente!");
-                
-                
-            }else{
-              javax.swing.JOptionPane.showMessageDialog(this, "No se pudo registrar el producto en la base de datos.", "Error de registro", javax.swing.JOptionPane.ERROR_MESSAGE); 
-            }
-        }catch (NumberFormatException ex) {
-            // Captura si metieron letras en campos de precios o stock
-            javax.swing.JOptionPane.showMessageDialog(this, 
-                    "Por favor, verifique los precios y stocks. Asegúrese de ingresar solo números (Use punto para decimales).", 
-                    "Error de Formato Numérico", javax.swing.JOptionPane.ERROR_MESSAGE);
+
+        String sku = SKUgen.getText().trim();
+        if (sku.equals("---") || sku.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "El SKU no se ha generado correctamente.", "Error de SKU", javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
         }
-       */
+
+        try {
+            // --- EXTRACCIÓN DE DATOS ---
+            String nombreProd = nombre.getText().trim();
+            String marcaProd = marca.getText().trim();
+            String contenidoNeto = tamano.getText().trim();
+            String codBarras = CodigoBarras.getText().trim();
+
+            double dPrecioCompra = Double.parseDouble(precioCompra.getText().trim());
+            double dPrecioVenta = Double.parseDouble(precio.getText().trim());
+            double dStockActual = Double.parseDouble(stock.getText().trim());
+            double dStockMinimo = Double.parseDouble(stockMinimo1.getText().trim());
+
+            // --- GUARDADO EN BASE DE DATOS ---
+            com.tienda.dao.ProductoDAO prodDAO = new com.tienda.dao.ProductoDAO();
+            boolean guardadoExitoso = prodDAO.guardarProducto(sku, nombreProd, dPrecioCompra, dPrecioVenta, dStockActual, dStockMinimo, codBarras, contenidoNeto, marcaProd);
+
+            if (guardadoExitoso) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Producto registrado y guardado correctamente");
+
+                // Actualizar la tabla del inventario
+                if (this.panelInventario != null) {
+                    this.panelInventario.cargarProductosEnTabla();
+                }
+
+                // Limpieza de campos para el siguiente producto
+                limpiarFormulario();
+
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this, "No se pudo registrar el producto.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (NumberFormatException ex) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Verifique los precios y stocks. Ingrese solo números válidos.", "Error de Formato", javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_aceptarActionPerformed
 
     private void generarSkuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generarSkuActionPerformed
@@ -244,18 +311,19 @@ String txtNombre = nombre.getText().trim();
         return; // Sale del método si falta información
     }
 
-    // 2. Lógica para construir el SKU (Tomamos subcadenas para que no quede un texto gigante)
-    // Ejemplo: Nombre "Arroz" -> "ARR", Marca "Costeña" -> "CO", Tamaño "1kg" -> "1KG"
-    String parteNombre = (txtNombre.length() >= 3) ? txtNombre.substring(0, 3) : txtNombre;
-    String parteMarca = (txtMarca.length() >= 2) ? txtMarca.substring(0, 2) : txtMarca;
-    // Eliminamos espacios intermedios en el tamaño por si escriben "100 gr"
-    String parteTamano = txtTamano.replace(" ", ""); 
+        // Dentro del evento del botón que genera el SKU en NuevoProductoDialog.java
+// 1. Instanciamos el DAO de configuración
+        com.tienda.dao.ConfiguracionDAO configDAO = new com.tienda.dao.ConfiguracionDAO();
 
-    // 3. Concatenar y convertir a mayúsculas (sin guiones)
-    String SKU = (parteNombre + parteMarca + parteTamano).toUpperCase();
+// 2. Le mandamos los textos limpios de los JTextFields al método inteligente
+        String skuGarantizado = configDAO.SKU(
+                nombre.getText().trim(),
+                marca.getText().trim(),
+                tamano.getText().trim()
+        );
 
-    // 4. Mostrar el SKU en pantalla
-    SKUgen.setText(SKU);
+// 3. Seteamos el JTextPane o JTextField del resultado con el código de 10 caracteres
+        SKUgen.setText(skuGarantizado);
     }//GEN-LAST:event_generarSkuActionPerformed
 
     private void stockMinimo1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stockMinimo1ActionPerformed
@@ -287,7 +355,7 @@ String txtNombre = nombre.getText().trim();
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                NuevoProductoDialog dialog = new NuevoProductoDialog(new javax.swing.JFrame(), true);
+                NuevoProductoDialog dialog = new NuevoProductoDialog(new javax.swing.JFrame(), true, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
@@ -300,6 +368,7 @@ String txtNombre = nombre.getText().trim();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField CodigoBarras;
     private javax.swing.JTextPane SKUgen;
     private javax.swing.JButton aceptar;
     private javax.swing.JButton agregarTipo;
