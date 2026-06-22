@@ -11,12 +11,32 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
+import com.tienda.modelo.Producto;
 /**
  *
  * @author Rec17
  */
 public class ProductoDAO {
 
+    public List<Producto> obtenerCatalogoVentas() {
+        List<Producto> listaProductos = new ArrayList<>();
+        // Traemos solo lo necesario y ordenamos alfabéticamente
+        // Puedes agregar "WHERE stock_actual > 0" si no quieres mostrar los agotados
+        String sql = "SELECT nombre, precio_venta FROM producto ORDER BY nombre ASC";
+
+        try (Connection conn = Conexion.getConexion(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                Producto prod = new Producto();
+                prod.setNombre(rs.getString("nombre"));
+                prod.setPrecioVenta(rs.getDouble("precio_venta"));
+                listaProductos.add(prod);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al cargar catálogo: " + e.getMessage());
+        }
+        return listaProductos;
+    }
     public boolean guardarProducto(String sku, String nombre, double precioCompra, double precioVenta, double stockActual, double stockMinimo, String codigoBarras, String contenidoNeto, String marca) {
 
         // Añadimos 'codigo_barras' a la consulta SQL
@@ -76,5 +96,29 @@ public class ProductoDAO {
         }
         
         return listaProductos;
+    }
+
+    public Producto buscarPorSKUOBarra(String criterio) {
+        Producto prod = null;
+        // Agregamos el OR para validar ambas columnas
+        String sql = "SELECT nombre, precio_venta FROM producto WHERE sku = ? OR codigo_barras = ?";
+
+        try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            // Asignamos el mismo criterio (lo que capturó el escáner o teclado) a ambos signos de interrogación
+            ps.setString(1, criterio);
+            ps.setString(2, criterio);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    prod = new Producto();
+                    prod.setNombre(rs.getString("nombre"));
+                    prod.setPrecioVenta(rs.getDouble("precio_venta"));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al buscar producto: " + e.getMessage());
+        }
+        return prod;
     }
 }
