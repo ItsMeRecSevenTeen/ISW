@@ -10,6 +10,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import com.tienda.dao.ProductoDAO;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -31,7 +34,7 @@ public class InventarioPanel extends javax.swing.JPanel {
         // Icono
         // itemCerrarSesion.setIcon(Icono); //Por si quiero importar un icono, pero 
         // no lo dice Diseño
-
+        cargarProductosEnTabla();
         // Agregar la acción al botón de cerrar sesión
         itemCerrarSesion.addActionListener(e -> {
             MainFrame framePrincipal = (MainFrame) javax.swing.SwingUtilities.getWindowAncestor(this);
@@ -84,7 +87,26 @@ public class InventarioPanel extends javax.swing.JPanel {
         
         jLabel2.setIconTextGap(20);
     }
+    
+    public void cargarProductosEnTabla() {
+        // Obtencion el modelo por defecto del jTable
+        DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
 
+        // Limpieza de  la tabla para que no se dupliquen los registros al recargar
+        modelo.setRowCount(0);
+
+        // Instanciar el DAO y traer la lista de objetos
+        ProductoDAO productoDAO = new ProductoDAO();
+        List<Object[]> productos = productoDAO.obtenerProductos();
+
+        // Recorrer la lista e ir agregando fila por fila al modelo de la tabla
+        for (Object[] fila : productos) {
+            // Añade la fila a la tabla Aunque se pase el arreglo con el ID en la posición 7,
+            // si la tabla en NetBeans solo tiene 7 columnas definidas visualmente, el ID se mantendrá 
+            // de forma "oculta" en la memoria del modelo
+            modelo.addRow(fila);
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -142,9 +164,31 @@ public class InventarioPanel extends javax.swing.JPanel {
             new String [] {
                 "Nombre", "SKU", "Precio", "Precio de compra", "Acciones", "Stock actual", "Stock mínimo"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jTable1.setShowGrid(true);
         jScrollPane1.setViewportView(jTable1);
+        if (jTable1.getColumnModel().getColumnCount() > 0) {
+            jTable1.getColumnModel().getColumn(0).setResizable(false);
+            jTable1.getColumnModel().getColumn(1).setResizable(false);
+            jTable1.getColumnModel().getColumn(2).setResizable(false);
+            jTable1.getColumnModel().getColumn(2).setPreferredWidth(10);
+            jTable1.getColumnModel().getColumn(3).setResizable(false);
+            jTable1.getColumnModel().getColumn(3).setPreferredWidth(10);
+            jTable1.getColumnModel().getColumn(4).setResizable(false);
+            jTable1.getColumnModel().getColumn(4).setPreferredWidth(10);
+            jTable1.getColumnModel().getColumn(5).setResizable(false);
+            jTable1.getColumnModel().getColumn(5).setPreferredWidth(10);
+            jTable1.getColumnModel().getColumn(6).setResizable(false);
+            jTable1.getColumnModel().getColumn(6).setPreferredWidth(10);
+        }
 
         add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 270, 1090, -1));
     }// </editor-fold>//GEN-END:initComponents
@@ -200,10 +244,8 @@ public class InventarioPanel extends javax.swing.JPanel {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
       java.awt.Frame parentFrame = (java.awt.Frame) javax.swing.SwingUtilities.getWindowAncestor(this);
 
-        // Instanciamos nuestro diálogo personalizado (parent, modal)
-        NuevoProductoDialog dialog = new NuevoProductoDialog(parentFrame, true);
-
-        // Mostrarlo en ventana
+        NuevoProductoDialog dialog = new NuevoProductoDialog(null, true, this);
+        dialog.setLocationRelativeTo(this); // Para que se centre bonito en la pantalla
         dialog.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
