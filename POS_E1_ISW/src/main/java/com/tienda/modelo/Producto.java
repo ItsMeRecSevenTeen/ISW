@@ -10,4 +10,30 @@ package com.tienda.modelo;
  */
 public class Producto {
     
+    // Declaramos las variables privadas (Variables de la DB)
+    private String nombre;
+    private double precioVenta;
+    
+    // private String sku; private double stockActual;
+
+    // Constructor vacío obligatorio
+    public Producto() {
+    }
+
+    // GETTERS Y SETTERS 
+    public String getNombre() {
+        return this.nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public double getPrecioVenta() {
+        return this.precioVenta;
+    }
+
+    public void setPrecioVenta(double precioVenta) {
+        this.precioVenta = precioVenta;
+    }
 }
