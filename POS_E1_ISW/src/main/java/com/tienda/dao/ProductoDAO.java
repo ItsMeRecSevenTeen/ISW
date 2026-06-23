@@ -22,15 +22,28 @@ public class ProductoDAO {
         List<Producto> listaProductos = new ArrayList<>();
         // Traemos solo lo necesario y ordenamos alfabéticamente
         // Puedes agregar "WHERE stock_actual > 0" si no quieres mostrar los agotados
-        String sql = "SELECT nombre, precio_venta FROM producto ORDER BY nombre ASC";
+        String sql = "SELECT id_producto, sku, nombre, precio_venta, contenido_neto FROM producto ORDER BY nombre ASC";
 
         try (Connection conn = Conexion.getConexion(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
                 Producto prod = new Producto();
-                prod.setNombre(rs.getString("nombre"));
-                prod.setPrecioVenta(rs.getDouble("precio_venta"));
-                listaProductos.add(prod);
+                // 1. Extraemos las partes
+            String nombreBase = rs.getString("nombre");
+            String contenido = rs.getString("contenido_neto");
+            
+            // Armando el nombre único para el botón y para el ticket
+            if (contenido != null && !contenido.isEmpty()) {
+                prod.setNombre(nombreBase + " " + contenido); // Ejemplo: "Agua Bonafont 2Lt"
+            } else {
+                prod.setNombre(nombreBase);
+            }
+            
+            prod.setPrecioVenta(rs.getDouble("precio_venta"));
+            // Aquí va el setting de los atributos
+            
+            // Agregar a la lista
+            listaProductos.add(prod);
             }
         } catch (SQLException e) {
             System.err.println("Error al cargar catálogo: " + e.getMessage());
@@ -100,19 +113,27 @@ public class ProductoDAO {
 
     public Producto buscarPorSKUOBarra(String criterio) {
         Producto prod = null;
-        // Agregamos el OR para validar ambas columnas
-        String sql = "SELECT nombre, precio_venta FROM producto WHERE sku = ? OR codigo_barras = ?";
+        // Agregamos contenido_neto a la consulta SQL
+        String sql = "SELECT nombre, precio_venta, contenido_neto FROM producto WHERE sku = ? OR codigo_barras = ?";
 
         try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-            // Asignamos el mismo criterio (lo que capturó el escáner o teclado) a ambos signos de interrogación
             ps.setString(1, criterio);
             ps.setString(2, criterio);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     prod = new Producto();
-                    prod.setNombre(rs.getString("nombre"));
+
+                    // Combinacion de el Nombre con el Contenido Neto si no es null
+                    String nombreBase = rs.getString("nombre");
+                    String contenido = rs.getString("contenido_neto");
+                    if (contenido != null && !contenido.isEmpty()) {
+                        prod.setNombre(nombreBase + " " + contenido); 
+                    } else {
+                        prod.setNombre(nombreBase);
+                    }
+
                     prod.setPrecioVenta(rs.getDouble("precio_venta"));
                 }
             }
