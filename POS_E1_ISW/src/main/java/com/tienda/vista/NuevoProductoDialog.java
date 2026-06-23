@@ -195,6 +195,8 @@ private void sanitizarCampo(javax.swing.JTextField campo, String regex, int maxL
         jScrollPane1.setViewportView(SKUgen);
 
         getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 260, 150, -1));
+
+        CodigoBarras.addActionListener(this::CodigoBarrasActionPerformed);
         getContentPane().add(CodigoBarras, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 350, 140, -1));
 
         pack();
@@ -329,6 +331,10 @@ String txtNombre = nombre.getText().trim();
     private void stockMinimo1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stockMinimo1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_stockMinimo1ActionPerformed
+
+    private void CodigoBarrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CodigoBarrasActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_CodigoBarrasActionPerformed
 
     /**
      * @param args the command line arguments

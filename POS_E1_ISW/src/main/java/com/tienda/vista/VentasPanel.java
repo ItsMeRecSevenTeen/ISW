@@ -13,40 +13,43 @@ import java.util.Map;
 import com.tienda.util.Sesion;
 import java.awt.Component;
 
+
 public class VentasPanel extends javax.swing.JPanel {
     private double costoTotal = 0.0;
     private JPanel panelListaProductos;
     private Map<String, FilaProducto> productosAgregados = new HashMap<>();
 
+    // Variables de navegación de pantallas incorporadas
+    private CardLayout navegador;
+    private JPanel contenedorTarjetas;
+    private JPanel TOTALPanel; 
+
     public VentasPanel() {
         initComponents();
+        configurarEstructuraCardLayout(); // Inicializa la navegación antes que los paneles internos
         
         // Crea el menú flotante
         JPopupMenu menuUsuario = new JPopupMenu();
 
-        //Crea la opción de cerrar sesión
+        // Crea la opción de cerrar sesión
         JMenuItem itemCerrarSesion = new JMenuItem("Cerrar caja");
         
         itemCerrarSesion.addActionListener(e -> {
             MainFrame framePrincipal = (MainFrame) javax.swing.SwingUtilities.getWindowAncestor(this);
             if (framePrincipal != null) {
-                // Instanciar el nuevo panel del Login de Administrador
-                CierreCaja cierreCaja = new CierreCaja(); //Para cada ventana, cambiar su constructor
-
-                // Mandar a hacer el intercambio
+                CierreCaja cierreCaja = new CierreCaja();
                 framePrincipal.cambiarPanel(cierreCaja);
             }
         });
+
         // Agregar el evento de clic al ícono de administrador
         jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                // .show(componente_origen, coordenada_X, coordenada_Y)
-                // X en 0 y Y justo al final de la altura del ícono para cuadrarlo bien
                 menuUsuario.show(jLabel1, 0, jLabel1.getHeight());
             }
         });
-        // Meter el ítem al menú
+
         menuUsuario.add(itemCerrarSesion);
         
         configurarPanel1();
@@ -56,9 +59,38 @@ public class VentasPanel extends javax.swing.JPanel {
         jLabel1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/user.svg", (float) 1.0));
         jTextField1.putClientProperty("JTextField.placeholderText", "Buscar por SKU o Código de Barras");
         cargarBotonesDinamicos();
+        configurarAccionBotonTotal(); // Enlaza el evento click del botón total
     }
     
-    
+    /**
+     * Envuelve los subpaneles en tarjetas intercambiables.
+     */
+    private void configurarEstructuraCardLayout() {
+        navegador = new CardLayout();
+        contenedorTarjetas = new JPanel(navegador);
+
+        TOTALPanel = new JPanel();
+        configurarTOTALPanelCheckout();
+
+        // Envolvemos el área de venta superior (Buscador, catálogo y carrito lateral)
+        JPanel vistaVentasMesa = new JPanel(new BorderLayout());
+        
+        // Contenedor superior para el buscador y el avatar del cajero
+        JPanel panelCabecera = new JPanel(new BorderLayout());
+        panelCabecera.add(jTextField1, BorderLayout.CENTER);
+        panelCabecera.add(jLabel1, BorderLayout.EAST);
+
+        vistaVentasMesa.add(panelCabecera, BorderLayout.NORTH);
+        vistaVentasMesa.add(jScrollPane2, BorderLayout.CENTER);
+        vistaVentasMesa.add(jPanel1, BorderLayout.EAST);
+
+        contenedorTarjetas.add(vistaVentasMesa, "PANTALLA_VENTAS");
+        contenedorTarjetas.add(TOTALPanel, "PANTALLA_TOTAL");
+
+        this.setLayout(new BorderLayout());
+        this.add(contenedorTarjetas, BorderLayout.CENTER);
+    }
+
     private void configurarPanel1() {
         jPanel1.setLayout(new BorderLayout());
         jPanel1.setPreferredSize(new Dimension(240, 360));
@@ -74,31 +106,209 @@ public class VentasPanel extends javax.swing.JPanel {
 
         actualizarBotonTotal();
     }
-    
+
+    private void configurarAccionBotonTotal() {
+        BotonTotal.addActionListener(e -> {
+            if (productosAgregados.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "El carrito de compras está vacío.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            construirDesgloseEnTOTALPanel();
+            navegador.show(contenedorTarjetas, "PANTALLA_TOTAL");
+        });
+    }
+
+    private void configurarTOTALPanelCheckout() {
+        TOTALPanel.setLayout(new BorderLayout());
+        TOTALPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+        JButton btnRegresar = new JButton("← Volver a Ventas");
+        btnRegresar.setFont(new Font("Arial", Font.BOLD, 12));
+        btnRegresar.addActionListener(e -> navegador.show(contenedorTarjetas, "PANTALLA_VENTAS"));
+
+        JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelSuperior.add(btnRegresar);
+        TOTALPanel.add(panelSuperior, BorderLayout.NORTH);
+    }
+
+    private void construirDesgloseEnTOTALPanel() {
+        BorderLayout layout = (BorderLayout) TOTALPanel.getLayout();
+        Component centroAntiguo = layout.getLayoutComponent(BorderLayout.CENTER);
+        if (centroAntiguo != null) {
+            TOTALPanel.remove(centroAntiguo);
+        }
+
+        JPanel panelCentralContenedor = new JPanel();
+        panelCentralContenedor.setLayout(new BoxLayout(panelCentralContenedor, BoxLayout.Y_AXIS));
+
+        JPanel panelTicket = new JPanel();
+        panelTicket.setLayout(new BoxLayout(panelTicket, BoxLayout.Y_AXIS));
+        panelTicket.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
+        panelTicket.setBackground(Color.WHITE);
+
+        for (FilaProducto fila : productosAgregados.values()) {
+            int cantidad = (int) fila.spinnerCantidad.getValue();
+            double subtotal = fila.precioUnitario * cantidad;
+
+            JPanel renglon = new JPanel(new BorderLayout());
+            renglon.setBackground(Color.WHITE);
+
+            JLabel lblProd = new JLabel(fila.nombreProd + " (x" + cantidad + ")");
+            lblProd.setFont(new Font("Monospaced", Font.PLAIN, 13));
+
+            JLabel lblPrecio = new JLabel("$" + String.format("%.2f", subtotal));
+            lblPrecio.setFont(new Font("Monospaced", Font.PLAIN, 13));
+
+            renglon.add(lblProd, BorderLayout.WEST);
+            renglon.add(lblPrecio, BorderLayout.EAST);
+            panelTicket.add(renglon);
+            panelTicket.add(Box.createRigidArea(new Dimension(0, 5)));
+        }
+
+        JSeparator separador = new JSeparator();
+        separador.setForeground(Color.DARK_GRAY);
+        panelTicket.add(Box.createRigidArea(new Dimension(0, 5)));
+        panelTicket.add(separador);
+        panelTicket.add(Box.createRigidArea(new Dimension(0, 8)));
+
+        JPanel renglonTotal = new JPanel(new BorderLayout());
+        renglonTotal.setBackground(Color.WHITE);
+        
+        JLabel lblTextoTotal = new JLabel("Total:");
+        lblTextoTotal.setFont(new Font("Monospaced", Font.BOLD, 15));
+        
+        JLabel lblValorTotal = new JLabel("$" + String.format("%.2f", costoTotal));
+        lblValorTotal.setFont(new Font("Monospaced", Font.BOLD, 15));
+
+        renglonTotal.add(lblTextoTotal, BorderLayout.WEST);
+        renglonTotal.add(lblValorTotal, BorderLayout.EAST);
+        panelTicket.add(renglonTotal);
+
+        JScrollPane scrollTicket = new JScrollPane(panelTicket);
+        scrollTicket.setPreferredSize(new Dimension(300, 160));
+        scrollTicket.setMaximumSize(new Dimension(300, 160));
+        scrollTicket.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JPanel panelAccionPago = new JPanel();
+        panelAccionPago.setLayout(new BoxLayout(panelAccionPago, BoxLayout.Y_AXIS));
+        panelAccionPago.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JPanel panelBotonesIniciales = new JPanel(new GridLayout(1, 2, 12, 0));
+        panelBotonesIniciales.setMaximumSize(new Dimension(300, 42));
+
+        JButton btnEfectivo = new JButton("Efectivo 💵");
+        btnEfectivo.setFont(new Font("Arial", Font.BOLD, 12));
+
+        JButton btnTarjeta = new JButton("Tarjeta 💳");
+        btnTarjeta.setFont(new Font("Arial", Font.BOLD, 12));
+        btnTarjeta.addActionListener(e -> finalizarTransaccion("Tarjeta"));
+
+        // Lógica de transición de cobro por Efectivo
+        btnEfectivo.addActionListener(e -> {
+            panelAccionPago.remove(panelBotonesIniciales);
+
+            JPanel panelIngresoEfectivo = new JPanel(new BorderLayout(5, 0));
+            panelIngresoEfectivo.setMaximumSize(new Dimension(300, 35));
+
+            JTextField txtEfectivo = new JTextField();
+            txtEfectivo.putClientProperty("JTextField.placeholderText", "Efectivo recibido");
+            txtEfectivo.setFont(new Font("Arial", Font.PLAIN, 13));
+
+            JButton btnCalcularCambio = new JButton("Aceptar");
+            btnCalcularCambio.setFont(new Font("Arial", Font.BOLD, 12));
+
+            panelIngresoEfectivo.add(new JLabel("Paga con: $"), BorderLayout.WEST);
+            panelIngresoEfectivo.add(txtEfectivo, BorderLayout.CENTER);
+            panelIngresoEfectivo.add(btnCalcularCambio, BorderLayout.EAST);
+
+            panelAccionPago.add(panelIngresoEfectivo);
+
+            btnCalcularCambio.addActionListener(evt -> {
+                try {
+                    double efectivo = Double.parseDouble(txtEfectivo.getText().trim());
+                    if (efectivo < costoTotal) {
+                        JOptionPane.showMessageDialog(TOTALPanel, "El efectivo ingresado es insuficiente.", "Dinero insuficiente", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+
+                    double cambio = efectivo - costoTotal;
+
+                    txtEfectivo.setEditable(false);
+                    btnCalcularCambio.setEnabled(false);
+
+                    JPanel panelCambioResultado = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                    JLabel lblCambio = new JLabel("SU CAMBIO: $" + String.format("%.2f", cambio));
+                    lblCambio.setFont(new Font("Arial", Font.BOLD, 14));
+                    lblCambio.setForeground(new Color(34, 139, 34));
+                    panelCambioResultado.add(lblCambio);
+
+                    JButton btnFinalizarEfectivo = new JButton("Finalizar Transacción ✓");
+                    btnFinalizarEfectivo.setFont(new Font("Arial", Font.BOLD, 13));
+                    btnFinalizarEfectivo.setMaximumSize(new Dimension(300, 40));
+                    btnFinalizarEfectivo.setAlignmentX(Component.CENTER_ALIGNMENT);
+                    btnFinalizarEfectivo.addActionListener(ev -> finalizarTransaccion("Efectivo"));
+
+                    panelAccionPago.add(Box.createRigidArea(new Dimension(0, 10)));
+                    panelAccionPago.add(panelCambioResultado);
+                    panelAccionPago.add(Box.createRigidArea(new Dimension(0, 10)));
+                    panelAccionPago.add(btnFinalizarEfectivo);
+
+                    TOTALPanel.revalidate();
+                    TOTALPanel.repaint();
+
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(TOTALPanel, "Por favor, introduzca un valor numérico válido.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+                }
+            });
+
+            TOTALPanel.revalidate();
+            TOTALPanel.repaint();
+        });
+
+        panelBotonesIniciales.add(btnEfectivo);
+        panelBotonesIniciales.add(btnTarjeta);
+        panelAccionPago.add(panelBotonesIniciales);
+
+        panelCentralContenedor.add(Box.createVerticalGlue());
+        panelCentralContenedor.add(scrollTicket);
+        panelCentralContenedor.add(Box.createRigidArea(new Dimension(0, 15)));
+        panelCentralContenedor.add(panelAccionPago);
+        panelCentralContenedor.add(Box.createVerticalGlue());
+
+        TOTALPanel.add(panelCentralContenedor, BorderLayout.CENTER);
+        TOTALPanel.revalidate();
+        TOTALPanel.repaint();
+    }
+
+    private void finalizarTransaccion(String metodoPago) {
+        JOptionPane.showMessageDialog(this, "Transacción completada exitosamente vía: " + metodoPago, "Venta Exitosa", JOptionPane.INFORMATION_MESSAGE);
+        
+        productosAgregados.clear();
+        panelListaProductos.removeAll();
+        costoTotal = 0.0;
+        actualizarBotonTotal();
+        
+        navegador.show(contenedorTarjetas, "PANTALLA_VENTAS");
+    }
 
     private void cargarBotonesDinamicos() {
         JPanel panelContenedor = new JPanel(new GridLayout(0, 4, 5, 5));
 
-        // 1. Llamamos a la base de datos mediante el DAO
         com.tienda.dao.ProductoDAO prodDAO = new com.tienda.dao.ProductoDAO();
         java.util.List<com.tienda.modelo.Producto> catalogo = prodDAO.obtenerCatalogoVentas();
 
-        // 2. Iteramos sobre los productos reales
         for (com.tienda.modelo.Producto prod : catalogo) {
             String nombreProducto = prod.getNombre();
             double precioProducto = prod.getPrecioVenta();
 
-            // Diseño del botón
-            // Usamos HTML simple para que el nombre se divida en dos líneas si es muy largo
             JButton boton = new JButton("<html><center>" + nombreProducto + "</center></html>");
             Dimension dimensionBoton = new Dimension(90, 90);
             boton.setPreferredSize(dimensionBoton);
             boton.setMinimumSize(dimensionBoton);
             boton.setMaximumSize(dimensionBoton);
-            boton.setFont(new Font("Arial", Font.BOLD, 10)); // Bajé un poco la fuente por si hay nombres largos
+            boton.setFont(new Font("Arial", Font.BOLD, 10));
             boton.setMargin(new Insets(2, 2, 2, 2));
 
-            // Mantenemos tu lógica intacta para agregar al carrito
             boton.addActionListener(e -> agregarOIncrementarProducto(nombreProducto, precioProducto));
 
             panelContenedor.add(boton);
@@ -128,44 +338,30 @@ public class VentasPanel extends javax.swing.JPanel {
     }
 
     private void agregarProductoAlTicket(Producto prod) {
-    String nombre = prod.getNombre();
+        String nombre = prod.getNombre();
 
-    // CASO A: El producto YA está en el mapa (containsKey sustituye a contains)
-    if (productosAgregados.containsKey(nombre)) {
-        // ¡Magia del Map! Obtenemos la fila directamente sin usar ningún ciclo FOR
-        FilaProducto fila = productosAgregados.get(nombre);
-        
-        int valorActual = (int) fila.spinnerCantidad.getValue();
-        fila.spinnerCantidad.setValue(valorActual + 1); 
-        // Esto ya dispara el ChangeListener que recalcula el total solo
-    } 
-    // CASO B: Es la primera vez que se escanea el producto
-    else {
-        FilaProducto nuevaFila = new FilaProducto(nombre, prod.getPrecioVenta());
-        panelListaProductos.add(nuevaFila);
+        if (productosAgregados.containsKey(nombre)) {
+            FilaProducto fila = productosAgregados.get(nombre);
+            int valorActual = (int) fila.spinnerCantidad.getValue();
+            fila.spinnerCantidad.setValue(valorActual + 1); 
+        } else {
+            FilaProducto nuevaFila = new FilaProducto(nombre, prod.getPrecioVenta());
+            panelListaProductos.add(nuevaFila);
+            productosAgregados.put(nombre, nuevaFila);
 
-        // Guardamos en el mapa: la llave es el 'nombre' y el valor es la 'nuevaFila'
-        // (put sustituye a add)
-        productosAgregados.put(nombre, nuevaFila);
+            costoTotal += prod.getPrecioVenta();
+            actualizarBotonTotal();
 
-        // Sumamos al costo total global
-        costoTotal += prod.getPrecioVenta();
-        actualizarBotonTotal();
-
-        // Refrescamos la interfaz
-        panelListaProductos.revalidate();
-        panelListaProductos.repaint();
+            panelListaProductos.revalidate();
+            panelListaProductos.repaint();
+        }
     }
-}
+
     private void actualizarBotonTotal() {
         BotonTotal.setText("TOTAL: $" + String.format("%.2f", costoTotal));
     }
 
-    /**
-     * Clase interna rediseñada para centrar elementos y agrandar el Spinner
-     */
     private class FilaProducto extends JPanel {
-
         private JSpinner spinnerCantidad;
         private JLabel lblPrecio;
         private double precioUnitario;
@@ -177,24 +373,20 @@ public class VentasPanel extends javax.swing.JPanel {
             this.precioUnitario = precio;
 
             this.setLayout(new GridBagLayout());
-
-            // SOLUCIÓN AL GAP (Rojo): Permitimos que la fila se expanda al ancho total disponible, manteniendo 42px de alto
             this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
-            this.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6)); // Margen interno de la fila
+            this.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
 
             GridBagConstraints gbc = new GridBagConstraints();
-            gbc.insets = new Insets(0, 4, 0, 4); // Espaciado entre elementos internos
+            gbc.insets = new Insets(0, 4, 0, 4);
 
-            // 1. Label de Nombre: Se queda con todo el espacio sobrante de la izquierda
             JLabel lblNombre = new JLabel(nombre);
             lblNombre.setFont(new Font("Arial", Font.BOLD, 11));
             gbc.gridx = 0;
-            gbc.weightx = 1.0; // <-- CLAVE: Absorbe todo el ancho libre y empuja al resto a la derecha
+            gbc.weightx = 1.0; 
             gbc.fill = GridBagConstraints.HORIZONTAL;
-            gbc.anchor = GridBagConstraints.WEST; // Alineado a la izquierda
+            gbc.anchor = GridBagConstraints.WEST; 
             this.add(lblNombre, gbc);
 
-            // Configurar Spinner
             SpinnerNumberModel modelo = new SpinnerNumberModel(1, 0, 99, 1);
             spinnerCantidad = new JSpinner(modelo);
             Dimension dimSpinner = new Dimension(52, 26);
@@ -210,21 +402,19 @@ public class VentasPanel extends javax.swing.JPanel {
             }
 
             gbc.gridx = 1;
-            gbc.weightx = 0.0; // Ancho fijo, no se deforma
+            gbc.weightx = 0.0; 
             gbc.fill = GridBagConstraints.NONE;
             gbc.anchor = GridBagConstraints.CENTER;
             this.add(spinnerCantidad, gbc);
 
-            // Label de Precio SOLUCIÓN AL RECORTE
             lblPrecio = new JLabel("$" + String.format("%.2f", precio));
             lblPrecio.setFont(new Font("Arial", Font.PLAIN, 11));
             gbc.gridx = 2;
-            gbc.weightx = 0.0; // Ancho fijo
+            gbc.weightx = 0.0; 
             gbc.fill = GridBagConstraints.NONE;
-            gbc.anchor = GridBagConstraints.EAST; // Alineado perfectamente a la derecha
+            gbc.anchor = GridBagConstraints.EAST; 
             this.add(lblPrecio, gbc);
 
-            // El listener el Spinner se queda exactamente igual abajo...
             spinnerCantidad.addChangeListener(e -> {
                 int nuevaCantidad = (int) spinnerCantidad.getValue();
                 if (nuevaCantidad == 0) {

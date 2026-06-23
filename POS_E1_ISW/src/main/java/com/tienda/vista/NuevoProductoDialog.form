@@ -204,6 +204,9 @@
       </SubComponents>
     </Container>
     <Component class="javax.swing.JTextField" name="CodigoBarras">
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="CodigoBarrasActionPerformed"/>
+      </Events>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
           <AbsoluteConstraints x="200" y="350" width="140" height="-1"/>
