@@ -281,15 +281,40 @@ public class VentasPanel extends javax.swing.JPanel {
     }
 
     private void finalizarTransaccion(String metodoPago) {
-        JOptionPane.showMessageDialog(this, "Transacción completada exitosamente vía: " + metodoPago, "Venta Exitosa", JOptionPane.INFORMATION_MESSAGE);
+        com.tienda.dao.ProductoDAO prodDAO = new com.tienda.dao.ProductoDAO();
+    boolean todoActualizado = true;
+
+    // 2. Recorrer los productos del carrito y restar el stock en la BD
+    for (FilaProducto fila : productosAgregados.values()) {
+        String nombreProd = fila.nombreProd;
+        int cantidadVendida = (int) fila.spinnerCantidad.getValue();
+
+        // Ejecutar la actualización en la base de datos
+        boolean exito = prodDAO.restarInventario(nombreProd, cantidadVendida);
         
-        productosAgregados.clear();
-        panelListaProductos.removeAll();
-        costoTotal = 0.0;
-        actualizarBotonTotal();
-        
-        navegador.show(contenedorTarjetas, "PANTALLA_VENTAS");
+        if (!exito) {
+            todoActualizado = false; // Si uno falla, registramos el inconveniente
+        }
     }
+
+    // 3. Mostrar mensaje de éxito según el resultado del inventario
+    if (todoActualizado) {
+        JOptionPane.showMessageDialog(this, "Transacción completada y stock actualizado vía: " + metodoPago, "Venta Exitosa", JOptionPane.INFORMATION_MESSAGE);
+    } else {
+        JOptionPane.showMessageDialog(this, "Venta realizada, pero hubo un problema al actualizar algunos productos en el inventario.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+    }
+    
+    // 4. Limpiar la mesa de venta y regresar al catálogo
+    productosAgregados.clear();
+    panelListaProductos.removeAll();
+    costoTotal = 0.0;
+    actualizarBotonTotal();
+    
+    // 5. Refrescar los botones del catálogo para que muestren datos reales (Opcional)
+    cargarBotonesDinamicos(); 
+    
+    navegador.show(contenedorTarjetas, "PANTALLA_VENTAS");
+}
 
     private void cargarBotonesDinamicos() {
         JPanel panelContenedor = new JPanel(new GridLayout(0, 4, 5, 5));

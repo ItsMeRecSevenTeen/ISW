@@ -121,4 +121,22 @@ public class ProductoDAO {
         }
         return prod;
     }
+  public boolean restarInventario(String nombreProducto, int cantidadVendida) {
+    String sql = "UPDATE productos SET stock = stock - ? WHERE nombre = ?";
+    
+    try (Connection con = Conexion.getConexion();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        
+        ps.setInt(1, cantidadVendida);
+        ps.setString(2, nombreProducto);
+        
+        int filasAfectadas = ps.executeUpdate();
+        return filasAfectadas > 0; // Retorna true si se actualizó el producto
+        
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "Error al actualizar inventario de " + nombreProducto + ": " + e.getMessage(), 
+                "Error de Base de Datos", JOptionPane.ERROR_MESSAGE);
+        return false;
+    }
+}  
 }
