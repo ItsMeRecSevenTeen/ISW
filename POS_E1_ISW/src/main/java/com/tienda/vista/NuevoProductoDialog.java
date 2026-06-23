@@ -78,6 +78,7 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
     precio.setText("");
     stock.setText("");
     stockMinimo1.setText("");
+    CodigoBarras.setText("");
     
     // Reseteamos el SKU a su estado inicial
     SKUgen.setText("---"); 
@@ -144,58 +145,60 @@ private void sanitizarCampo(javax.swing.JTextField campo, String regex, int maxL
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setBounds(new java.awt.Rectangle(0, 30, 505, 500));
-        setMinimumSize(new java.awt.Dimension(500, 500));
         setName("nuevoProducto"); // NOI18N
+        setPreferredSize(new java.awt.Dimension(400, 450));
+        setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        tipoProducto.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Refrescos", "Frituras", "Lacteos", "Dulces" }));
+        tipoProducto.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione un tipo", "Refrescos", "Frituras", "Lacteos", "Dulces" }));
         tipoProducto.addActionListener(this::tipoProductoActionPerformed);
-        getContentPane().add(tipoProducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, 120, -1));
+        getContentPane().add(tipoProducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 150, -1));
 
         agregarTipo.setText("Agregar tipo +");
         agregarTipo.addActionListener(this::agregarTipoActionPerformed);
-        getContentPane().add(agregarTipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 60, -1, -1));
+        getContentPane().add(agregarTipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 50, -1, -1));
 
         precioCompra.addActionListener(this::precioCompraActionPerformed);
-        getContentPane().add(precioCompra, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 260, 150, -1));
+        getContentPane().add(precioCompra, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 250, 150, -1));
 
         precio.addActionListener(this::precioActionPerformed);
-        getContentPane().add(precio, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 110, 150, -1));
+        getContentPane().add(precio, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 100, 150, -1));
 
         stock.addActionListener(this::stockActionPerformed);
-        getContentPane().add(stock, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 160, 150, -1));
+        getContentPane().add(stock, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 150, 150, -1));
 
         tamano.addActionListener(this::tamanoActionPerformed);
-        getContentPane().add(tamano, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 160, 150, -1));
+        getContentPane().add(tamano, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 150, 150, -1));
 
         nombre.addActionListener(this::nombreActionPerformed);
-        getContentPane().add(nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, 150, -1));
+        getContentPane().add(nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 100, 150, -1));
 
         marca.addActionListener(this::marcaActionPerformed);
-        getContentPane().add(marca, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 210, 150, -1));
+        getContentPane().add(marca, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 200, 150, -1));
 
         jLabel2.setText("Tipo de producto");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 30, 170, -1));
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 170, -1));
 
         jLabel3.setFont(new java.awt.Font("Helvetica", 1, 18)); // NOI18N
         jLabel3.setText("Código de barras");
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 350, 170, -1));
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 330, 170, -1));
 
         aceptar.addActionListener(this::aceptarActionPerformed);
-        getContentPane().add(aceptar, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 400, -1, 30));
+        getContentPane().add(aceptar, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 370, -1, 30));
 
         generarSku.setText("Generar SKU");
         generarSku.addActionListener(this::generarSkuActionPerformed);
-        getContentPane().add(generarSku, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 300, -1, -1));
+        getContentPane().add(generarSku, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 280, -1, -1));
 
         stockMinimo1.addActionListener(this::stockMinimo1ActionPerformed);
-        getContentPane().add(stockMinimo1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 210, 150, -1));
+        getContentPane().add(stockMinimo1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 200, 150, -1));
 
         SKUgen.setEditable(false);
+        SKUgen.setFocusable(false);
         jScrollPane1.setViewportView(SKUgen);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 260, 150, -1));
-        getContentPane().add(CodigoBarras, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 350, 140, -1));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 250, 150, -1));
+        getContentPane().add(CodigoBarras, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 330, 140, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
