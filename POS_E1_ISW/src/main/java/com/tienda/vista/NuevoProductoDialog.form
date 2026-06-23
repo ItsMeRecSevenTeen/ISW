@@ -35,11 +35,12 @@
     <Component class="javax.swing.JComboBox" name="tipoProducto">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="4">
-            <StringItem index="0" value="Refrescos"/>
-            <StringItem index="1" value="Frituras"/>
-            <StringItem index="2" value="Lacteos"/>
-            <StringItem index="3" value="Dulces"/>
+          <StringArray count="5">
+            <StringItem index="0" value="Seleccione un tipo"/>
+            <StringItem index="1" value="Refrescos"/>
+            <StringItem index="2" value="Frituras"/>
+            <StringItem index="3" value="Lacteos"/>
+            <StringItem index="4" value="Dulces"/>
           </StringArray>
         </Property>
       </Properties>
@@ -51,7 +52,7 @@
       </AuxValues>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="20" y="60" width="120" height="-1"/>
+          <AbsoluteConstraints x="20" y="60" width="150" height="-1"/>
         </Constraint>
       </Constraints>
     </Component>
