@@ -255,12 +255,28 @@ private void sanitizarCampo(javax.swing.JTextField campo, String regex, int maxL
                 || tamano.getText().trim().isEmpty() || precioCompra.getText().trim().isEmpty()
                 || precio.getText().trim().isEmpty() || stock.getText().trim().isEmpty()
                 || stockMinimo1.getText().trim().isEmpty()
-                || CodigoBarras.getText().trim().isEmpty()) {
+                || CodigoBarras.getText().trim().isEmpty()
+                || (tipoProducto.getSelectedIndex() <= 0 || tipoProducto.getSelectedItem().toString().equals("Seleccione un tipo"))) {
 
-            javax.swing.JOptionPane.showMessageDialog(this, "Todos los campos son requeridos, incluyendo el Código de Barras.", "Campos vacíos", javax.swing.JOptionPane.WARNING_MESSAGE);
+            javax.swing.JOptionPane.showMessageDialog(this, "Todos los campos son requeridos, incluyendo el Código de Barras", "Campos vacíos", javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
+        try {
+            // 1. Convertimos los textos a números reales
+            int cantStockMinimo = Integer.parseInt(stockMinimo1.getText().trim());
+            int cantStockActual = Integer.parseInt(stock.getText().trim());
 
+            // 2. Hacemos tu validación de negocio
+            if (cantStockMinimo > cantStockActual) {
+                javax.swing.JOptionPane.showMessageDialog(this, "El Stock Mínimo no puede ser mayor que el Stock Actual", "Error de Inventario", javax.swing.JOptionPane.WARNING_MESSAGE);
+                stockMinimo1.requestFocus();
+                return;
+            }
+        } catch (NumberFormatException e) {
+            // Si el usuario metió letras, letras chinas, símbolos o dejó vacío algo numérico
+            javax.swing.JOptionPane.showMessageDialog(this, "Los campos de Stock y Stock Mínimo deben ser números enteros válidos", "Error de Formato", javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         String sku = SKUgen.getText().trim();
         if (sku.equals("---") || sku.isEmpty()) {
             javax.swing.JOptionPane.showMessageDialog(this, "El SKU no se ha generado correctamente.", "Error de SKU", javax.swing.JOptionPane.ERROR_MESSAGE);
