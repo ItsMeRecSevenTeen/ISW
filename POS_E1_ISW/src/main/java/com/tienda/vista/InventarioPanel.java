@@ -107,6 +107,46 @@ public class InventarioPanel extends javax.swing.JPanel {
             modelo.addRow(fila);
         }
     }
+    private void eliminarProductoSeleccionado() {
+        int filaSeleccionada = jTable1.getSelectedRow();
+
+        // 1. Validar que el usuario haya hecho clic sobre algún registro de la tabla
+        if (filaSeleccionada == -1) {
+            JOptionPane.showMessageDialog(this, "Por favor, seleccione un producto de la tabla para eliminar.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // 2. Extraer el nombre para la ventana decorativa y el ID oculto del modelo en memoria (posible índice 7)
+        DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
+        String nombreProducto = (String) modelo.getValueAt(filaSeleccionada, 1); // Asumiendo columna 1 = Nombre
+        int idProducto = (int) modelo.getValueAt(filaSeleccionada, 7); // ID guardado de forma oculta en el Object[]
+
+        // 3. Ventana emergente con opciones estrictas de SÍ y NO
+        int respuesta = JOptionPane.showConfirmDialog(
+                this, 
+                "¿Está seguro de querer eliminar el producto \"" + nombreProducto + "\"?", 
+                "Confirmar Eliminación", 
+                JOptionPane.YES_NO_OPTION, 
+                JOptionPane.QUESTION_MESSAGE
+        );
+
+        // 4. Si la opción elegida es "SÍ"
+        if (respuesta == JOptionPane.YES_OPTION) {
+            ProductoDAO productoDAO = new ProductoDAO();
+            
+            // Ejecutar la baja lógica/física en la Base de Datos mediante su ID
+            boolean exitoBD = productoDAO.eliminarProducto(idProducto); 
+
+            if (exitoBD) {
+                // Remover visualmente la fila de la interfaz gráfica
+                modelo.removeRow(filaSeleccionada);
+                JOptionPane.showMessageDialog(this, "Producto eliminado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al intentar eliminar el producto de la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        // Si es NO, la ventana se cierra de manera nativa sin ejecutar código extra.
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
