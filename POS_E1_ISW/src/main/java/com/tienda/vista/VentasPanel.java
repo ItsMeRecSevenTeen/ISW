@@ -35,20 +35,33 @@ public class VentasPanel extends javax.swing.JPanel {
         JMenuItem itemCerrarSesion = new JMenuItem("Cerrar caja");
         
         itemCerrarSesion.addActionListener(e -> {
-            MainFrame framePrincipal = (MainFrame) javax.swing.SwingUtilities.getWindowAncestor(this);
-            if (framePrincipal != null) {
-                CierreCaja cierreCaja = new CierreCaja();
-                framePrincipal.cambiarPanel(cierreCaja);
-            }
-        });
+    // 1. Mostrar el diálogo de confirmación con las opciones Aceptar y Cancelar
+    int confirmacion = JOptionPane.showConfirmDialog(
+            this, 
+            "¿Estás seguro de querer concluir el turno?", 
+            "Confirmar Cierre de Caja", 
+            JOptionPane.OK_CANCEL_OPTION, 
+            JOptionPane.QUESTION_MESSAGE
+    );
 
-        // Agregar el evento de clic al ícono de administrador
-        jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                menuUsuario.show(jLabel1, 0, jLabel1.getHeight());
-            }
-        });
+    // 2. Si el usuario presiona "Aceptar" (OK_OPTION), continúa el flujo hacia CierreCaja
+    if (confirmacion == JOptionPane.OK_OPTION) {
+        MainFrame framePrincipal = (MainFrame) javax.swing.SwingUtilities.getWindowAncestor(this);
+        if (framePrincipal != null) {
+            CierreCaja cierreCaja = new CierreCaja();
+            framePrincipal.cambiarPanel(cierreCaja);
+        }
+    }
+    // Si presiona Cancelar o cierra la ventana emergente, no hace nada (se queda en el panel actual)
+});
+
+// Agregar el evento de clic al ícono de administrador
+jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
+    @Override
+    public void mouseClicked(java.awt.event.MouseEvent evt) {
+        menuUsuario.show(jLabel1, 0, jLabel1.getHeight());
+    }
+});
 
         menuUsuario.add(itemCerrarSesion);
         
