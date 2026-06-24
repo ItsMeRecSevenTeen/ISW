@@ -13,6 +13,7 @@ public class Producto {
     // Declaramos las variables privadas (Variables de la DB)
     private String nombre;
     private double precioVenta;
+    private String codigoBarras;
     
     // private String sku; private double stockActual;
 
@@ -27,6 +28,14 @@ public class Producto {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+    
+    public String getCodigoBarras() {
+        return this.codigoBarras;
+    }
+    
+    public void setCodigoBarras(String codigoBarras) {
+        this.codigoBarras = codigoBarras;
     }
 
     public double getPrecioVenta() {
