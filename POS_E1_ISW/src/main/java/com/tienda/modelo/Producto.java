@@ -13,6 +13,8 @@ public class Producto {
     // Declaramos las variables privadas (Variables de la DB)
     private String nombre;
     private double precioVenta;
+    private int stockActual;
+    private int stockMinimo;
     
     // private String sku; private double stockActual;
 
@@ -35,6 +37,18 @@ public class Producto {
 
     public void setPrecioVenta(double precioVenta) {
         this.precioVenta = precioVenta;
+    }
+    public double getStock(){
+        return this.stockActual;
+    }
+    public void setStock(int stockActual){
+        this.stockActual=stockActual;
+    }
+    public double getStockMinimo(){
+        return this.stockMinimo;
+    }
+    public void setStockMinimo(int stockMinimo){
+        this.stockMinimo=stockMinimo;
     }
     
 }

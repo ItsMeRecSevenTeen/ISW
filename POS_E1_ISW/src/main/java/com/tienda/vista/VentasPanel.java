@@ -326,7 +326,16 @@ public class VentasPanel extends javax.swing.JPanel {
             String nombreProducto = prod.getNombre();
             double precioProducto = prod.getPrecioVenta();
 
-            JButton boton = new JButton("<html><center>" + nombreProducto + "</center></html>");
+            // LÓGICA DE ALERTA VISUAL: Evaluamos los límites de inventario reales
+            String textoBoton;
+            if (prod.getStock() <= prod.getStockMinimo()) {
+                // Inyectamos estilo CSS inline para forzar el color rojo (Red #FF0000)
+                textoBoton = "<html><center><span style='color: #FF0000; font-weight: bold;'>" + nombreProducto + "</span></center></html>";
+            } else {
+                textoBoton = "<html><center>" + nombreProducto + "</center></html>";
+            }
+
+            JButton boton = new JButton(textoBoton);
             Dimension dimensionBoton = new Dimension(90, 90);
             boton.setPreferredSize(dimensionBoton);
             boton.setMinimumSize(dimensionBoton);
