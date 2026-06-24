@@ -22,7 +22,7 @@ public class ProductoDAO {
         List<Producto> listaProductos = new ArrayList<>();
         // Traemos solo lo necesario y ordenamos alfabéticamente
         // Puedes agregar "WHERE stock_actual > 0" si no quieres mostrar los agotados
-        String sql = "SELECT id_producto, sku, nombre, precio_venta, contenido_neto FROM producto ORDER BY nombre ASC";
+        String sql = "SELECT id_producto, sku, nombre, precio_venta, contenido_neto, codigo_barras FROM producto ORDER BY nombre ASC";
 
         try (Connection conn = Conexion.getConexion(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
 
@@ -40,6 +40,7 @@ public class ProductoDAO {
             }
             
             prod.setPrecioVenta(rs.getDouble("precio_venta"));
+            prod.setCodigoBarras(rs.getString("codigo_barras"));
             // Aquí va el setting de los atributos
             
             // Agregar a la lista
@@ -135,6 +136,7 @@ public class ProductoDAO {
                     }
 
                     prod.setPrecioVenta(rs.getDouble("precio_venta"));
+                    prod.setCodigoBarras(rs.getString("codigo_barras"));
                 }
             }
         } catch (SQLException e) {
@@ -142,22 +144,21 @@ public class ProductoDAO {
         }
         return prod;
     }
-  public boolean restarInventario(String nombreProducto, int cantidadVendida) {
-    String sql = "UPDATE productos SET stock = stock - ? WHERE nombre = ?";
-    
-    try (Connection con = Conexion.getConexion();
-         PreparedStatement ps = con.prepareStatement(sql)) {
-        
-        ps.setInt(1, cantidadVendida);
-        ps.setString(2, nombreProducto);
-        
-        int filasAfectadas = ps.executeUpdate();
-        return filasAfectadas > 0; // Retorna true si se actualizó el producto
-        
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(null, "Error al actualizar inventario de " + nombreProducto + ": " + e.getMessage(), 
-                "Error de Base de Datos", JOptionPane.ERROR_MESSAGE);
-        return false;
+  public boolean restarInventario(String codigoBarras, int cantidadVendida) {
+        String sql = "UPDATE producto SET stock_actual = stock_actual - ? WHERE codigo_barras = ?";
+
+        try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, cantidadVendida);
+            ps.setString(2, codigoBarras);
+
+            int filasAfectadas = ps.executeUpdate();
+            return filasAfectadas > 0; // Retorna true si se actualizó el producto
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al actualizar inventario del código" + codigoBarras + ": " + e.getMessage(),
+                    "Error de Base de Datos", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
     }
-}  
 }
