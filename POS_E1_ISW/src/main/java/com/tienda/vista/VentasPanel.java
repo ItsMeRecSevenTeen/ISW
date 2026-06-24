@@ -22,8 +22,8 @@ public class VentasPanel extends javax.swing.JPanel {
     // Variables de navegación de pantallas incorporadas
     private CardLayout navegador;
     private JPanel contenedorTarjetas;
-    private JPanel TOTALPanel; 
-
+    private JPanel TOTALPanel;
+    
     public VentasPanel() {
         initComponents();
         configurarEstructuraCardLayout(); // Inicializa la navegación antes que los paneles internos
@@ -286,11 +286,11 @@ public class VentasPanel extends javax.swing.JPanel {
 
     // 2. Recorrer los productos del carrito y restar el stock en la BD
     for (FilaProducto fila : productosAgregados.values()) {
-        String nombreProd = fila.nombreProd;
+        String codigoBarras = fila.codigoBarras;
         int cantidadVendida = (int) fila.spinnerCantidad.getValue();
 
         // Ejecutar la actualización en la base de datos
-        boolean exito = prodDAO.restarInventario(nombreProd, cantidadVendida);
+        boolean exito = prodDAO.restarInventario(codigoBarras, cantidadVendida);
         
         if (!exito) {
             todoActualizado = false; // Si uno falla, registramos el inconveniente
@@ -321,10 +321,10 @@ public class VentasPanel extends javax.swing.JPanel {
 
         com.tienda.dao.ProductoDAO prodDAO = new com.tienda.dao.ProductoDAO();
         java.util.List<com.tienda.modelo.Producto> catalogo = prodDAO.obtenerCatalogoVentas();
-
         for (com.tienda.modelo.Producto prod : catalogo) {
             String nombreProducto = prod.getNombre();
             double precioProducto = prod.getPrecioVenta();
+            String codigoBarrasProducto = prod.getCodigoBarras();
 
             JButton boton = new JButton("<html><center>" + nombreProducto + "</center></html>");
             Dimension dimensionBoton = new Dimension(90, 90);
@@ -334,7 +334,7 @@ public class VentasPanel extends javax.swing.JPanel {
             boton.setFont(new Font("Arial", Font.BOLD, 10));
             boton.setMargin(new Insets(2, 2, 2, 2));
 
-            boton.addActionListener(e -> agregarOIncrementarProducto(nombreProducto, precioProducto));
+            boton.addActionListener(e -> agregarOIncrementarProducto(nombreProducto, precioProducto, codigoBarrasProducto));
 
             panelContenedor.add(boton);
         }
@@ -344,13 +344,13 @@ public class VentasPanel extends javax.swing.JPanel {
         panelContenedor.repaint();
     }
 
-    private void agregarOIncrementarProducto(String nombre, double precio) {
+    private void agregarOIncrementarProducto(String nombre, double precio, String codigoBarras) {
         if (productosAgregados.containsKey(nombre)) {
             FilaProducto fila = productosAgregados.get(nombre);
             int cantidadActual = (int) fila.spinnerCantidad.getValue();
             fila.spinnerCantidad.setValue(cantidadActual + 1);
         } else {
-            FilaProducto nuevaFila = new FilaProducto(nombre, precio);
+            FilaProducto nuevaFila = new FilaProducto(nombre, precio,codigoBarras);
             productosAgregados.put(nombre, nuevaFila);
             panelListaProductos.add(nuevaFila);
             
@@ -370,7 +370,7 @@ public class VentasPanel extends javax.swing.JPanel {
             int valorActual = (int) fila.spinnerCantidad.getValue();
             fila.spinnerCantidad.setValue(valorActual + 1); 
         } else {
-            FilaProducto nuevaFila = new FilaProducto(nombre, prod.getPrecioVenta());
+            FilaProducto nuevaFila = new FilaProducto(nombre, prod.getPrecioVenta(), prod.getCodigoBarras());
             panelListaProductos.add(nuevaFila);
             productosAgregados.put(nombre, nuevaFila);
 
@@ -392,10 +392,13 @@ public class VentasPanel extends javax.swing.JPanel {
         private double precioUnitario;
         private String nombreProd;
         private int cantidadAnterior = 1;
+        public String codigoBarras;
 
-        public FilaProducto(String nombre, double precio) {
+
+        public FilaProducto(String nombre, double precio, String codigoBarras) {
             this.nombreProd = nombre;
             this.precioUnitario = precio;
+            this.codigoBarras = codigoBarras;
 
             this.setLayout(new GridBagLayout());
             this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
