@@ -147,13 +147,15 @@ public class VentasPanel extends javax.swing.JPanel {
         panelTicket.setBackground(Color.WHITE);
 
         for (FilaProducto fila : productosAgregados.values()) {
-            int cantidad = (int) fila.spinnerCantidad.getValue();
+            double cantidad = ((Number) fila.spinnerCantidad.getValue()).doubleValue();
             double subtotal = fila.precioUnitario * cantidad;
 
             JPanel renglon = new JPanel(new BorderLayout());
             renglon.setBackground(Color.WHITE);
 
-            JLabel lblProd = new JLabel(fila.nombreProd + " (x" + cantidad + ")");
+            String textoCantidad = (cantidad % 1 == 0) ? String.format("%.0f", cantidad) : String.format("%.3f", cantidad);
+            
+            JLabel lblProd = new JLabel(fila.nombreProd + " (x" + textoCantidad + ")");
             lblProd.setFont(new Font("Monospaced", Font.PLAIN, 13));
 
             JLabel lblPrecio = new JLabel("$" + String.format("%.2f", subtotal));
@@ -287,7 +289,7 @@ public class VentasPanel extends javax.swing.JPanel {
     // 2. Recorrer los productos del carrito y restar el stock en la BD
     for (FilaProducto fila : productosAgregados.values()) {
         String codigoBarras = fila.codigoBarras;
-        int cantidadVendida = (int) fila.spinnerCantidad.getValue();
+        double cantidadVendida = ((Number) fila.spinnerCantidad.getValue()).doubleValue();
 
         // Ejecutar la actualización en la base de datos
         boolean exito = prodDAO.restarInventario(codigoBarras, cantidadVendida);
@@ -344,13 +346,16 @@ public class VentasPanel extends javax.swing.JPanel {
         panelContenedor.repaint();
     }
 
-    private void agregarOIncrementarProducto(String nombre, double precio, String codigoBarras) {
+private void agregarOIncrementarProducto(String nombre, double precio, String codigoBarras) {
         if (productosAgregados.containsKey(nombre)) {
             FilaProducto fila = productosAgregados.get(nombre);
-            int cantidadActual = (int) fila.spinnerCantidad.getValue();
-            fila.spinnerCantidad.setValue(cantidadActual + 1);
+            // 1. Extraemos el valor de forma segura como double
+            double cantidadActual = ((Number) fila.spinnerCantidad.getValue()).doubleValue();
+            // 2. Sumamos 1.0 (en formato decimal)
+            fila.spinnerCantidad.setValue(cantidadActual + 1.0);
         } else {
-            FilaProducto nuevaFila = new FilaProducto(nombre, precio,codigoBarras);
+            // 3. Agregamos el 1.0 como parámetro de 'cantidadInicial' al constructor
+            FilaProducto nuevaFila = new FilaProducto(nombre, precio, codigoBarras, 1.0);
             productosAgregados.put(nombre, nuevaFila);
             panelListaProductos.add(nuevaFila);
             
@@ -362,19 +367,23 @@ public class VentasPanel extends javax.swing.JPanel {
         panelListaProductos.repaint();
     }
 
-    private void agregarProductoAlTicket(Producto prod) {
+    private void agregarProductoAlTicket(Producto prod, double cantidad, double precioAplicado) {
         String nombre = prod.getNombre();
 
         if (productosAgregados.containsKey(nombre)) {
+            // Si el producto ya está en el carrito, le sumamos la nueva cantidad
             FilaProducto fila = productosAgregados.get(nombre);
-            int valorActual = (int) fila.spinnerCantidad.getValue();
-            fila.spinnerCantidad.setValue(valorActual + 1); 
+            // Usamos (Number) para evitar errores de casteo entre Integer y Double
+            double valorActual = ((Number) fila.spinnerCantidad.getValue()).doubleValue();
+            fila.spinnerCantidad.setValue(valorActual + cantidad);
         } else {
-            FilaProducto nuevaFila = new FilaProducto(nombre, prod.getPrecioVenta(), prod.getCodigoBarras());
+            // Si es nuevo, lo mandamos a la fila con su cantidad inicial y su precio aplicado
+            FilaProducto nuevaFila = new FilaProducto(nombre, precioAplicado, prod.getCodigoBarras(), cantidad);
             panelListaProductos.add(nuevaFila);
             productosAgregados.put(nombre, nuevaFila);
 
-            costoTotal += prod.getPrecioVenta();
+            // Sumamos al total (Cantidad x Precio)
+            costoTotal += (precioAplicado * cantidad);
             actualizarBotonTotal();
 
             panelListaProductos.revalidate();
@@ -391,14 +400,15 @@ public class VentasPanel extends javax.swing.JPanel {
         private JLabel lblPrecio;
         private double precioUnitario;
         private String nombreProd;
-        private int cantidadAnterior = 1;
+        private double cantidadAnterior;
         public String codigoBarras;
 
 
-        public FilaProducto(String nombre, double precio, String codigoBarras) {
+        public FilaProducto(String nombre, double precio, String codigoBarras, double cantidadInicial) {
             this.nombreProd = nombre;
             this.precioUnitario = precio;
             this.codigoBarras = codigoBarras;
+            this.cantidadAnterior = cantidadInicial;
 
             this.setLayout(new GridBagLayout());
             this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
@@ -415,9 +425,9 @@ public class VentasPanel extends javax.swing.JPanel {
             gbc.anchor = GridBagConstraints.WEST; 
             this.add(lblNombre, gbc);
 
-            SpinnerNumberModel modelo = new SpinnerNumberModel(1, 0, 99, 1);
+            SpinnerNumberModel modelo = new SpinnerNumberModel(cantidadInicial, 0.0, 999.0, 1.0);
             spinnerCantidad = new JSpinner(modelo);
-            Dimension dimSpinner = new Dimension(52, 26);
+            Dimension dimSpinner = new Dimension(60, 26);
             spinnerCantidad.setPreferredSize(dimSpinner);
             spinnerCantidad.setMinimumSize(dimSpinner);
             spinnerCantidad.setMaximumSize(dimSpinner);
@@ -435,7 +445,7 @@ public class VentasPanel extends javax.swing.JPanel {
             gbc.anchor = GridBagConstraints.CENTER;
             this.add(spinnerCantidad, gbc);
 
-            lblPrecio = new JLabel("$" + String.format("%.2f", precio));
+            lblPrecio = new JLabel("$" + String.format("%.2f", precio * cantidadInicial));
             lblPrecio.setFont(new Font("Arial", Font.PLAIN, 11));
             gbc.gridx = 2;
             gbc.weightx = 0.0; 
@@ -444,15 +454,15 @@ public class VentasPanel extends javax.swing.JPanel {
             this.add(lblPrecio, gbc);
 
             spinnerCantidad.addChangeListener(e -> {
-                int nuevaCantidad = (int) spinnerCantidad.getValue();
+                double nuevaCantidad = ((Number) spinnerCantidad.getValue()).doubleValue();
                 if (nuevaCantidad == 0) {
-                    costoTotal -= precioUnitario;
+                    costoTotal -= (precioUnitario * cantidadAnterior);
                     panelListaProductos.remove(this);
                     productosAgregados.remove(nombreProd);
                     panelListaProductos.revalidate();
                     panelListaProductos.repaint();
                 } else {
-                    int diferencia = nuevaCantidad - cantidadAnterior;
+                    double diferencia = nuevaCantidad - cantidadAnterior;
                     costoTotal += (diferencia * precioUnitario);
                     lblPrecio.setText("$" + String.format("%.2f", precioUnitario * nuevaCantidad));
                     cantidadAnterior = nuevaCantidad;
@@ -515,16 +525,41 @@ public class VentasPanel extends javax.swing.JPanel {
 
         if (productoEncontrado != null) {
             //  Si existe, mandarlo al panel
-            agregarProductoAlTicket(productoEncontrado);
-        } else {
-            // El producto no existe o está mal registrado
-            JOptionPane.showMessageDialog(this, "Producto no encontrado: " + skuEscaneado, "Aviso", JOptionPane.WARNING_MESSAGE);
-        }
+            double cantidadAAgregar = 1.0;
+            double precioAplicado = productoEncontrado.getPrecioVenta();
 
-        // PREPARACIÓN PARA EL SIGUIENTE ESCANEO (¡Crucial!)
-        jTextField1.setText(""); // Limpiamos el texto
-        jTextField1.requestFocus(); // Obligamos al cursor a quedarse parpadeando ahí
-    }
+            // 2. Validar si es a granel
+            if (productoEncontrado.isEsGranel()) {
+                // Abrir el JDialog modal para pedir el peso
+                String inputPeso = JOptionPane.showInputDialog(this,
+                        "Producto a Granel: " + productoEncontrado.getNombre() + "\nIngrese el peso en Kg:",
+                        "Venta a Granel",
+                        JOptionPane.QUESTION_MESSAGE);
+
+                if (inputPeso == null || inputPeso.trim().isEmpty()) {
+                    return; // El usuario canceló la operación
+                }
+
+                try {
+                    cantidadAAgregar = Double.parseDouble(inputPeso);
+                    precioAplicado = productoEncontrado.getPrecioPorKg();
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(this, "Peso no válido.");
+                    return;
+                }
+            }
+
+                // 3. Añadir al modelo del JTable del carrito
+                agregarProductoAlTicket(productoEncontrado, cantidadAAgregar, precioAplicado);
+            } else {
+                // El producto no existe o está mal registrado
+                JOptionPane.showMessageDialog(this, "Producto no encontrado: " + skuEscaneado, "Aviso", JOptionPane.WARNING_MESSAGE);
+            }
+
+            // PREPARACIÓN PARA EL SIGUIENTE ESCANEO (¡Crucial!)
+            jTextField1.setText(""); // Limpiamos el texto
+            jTextField1.requestFocus(); // Obligamos al cursor a quedarse parpadeando ahí
+        }
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void BotonTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonTotalActionPerformed
