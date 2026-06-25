@@ -144,12 +144,12 @@ public class ProductoDAO {
         }
         return prod;
     }
-  public boolean restarInventario(String codigoBarras, int cantidadVendida) {
+  public boolean restarInventario(String codigoBarras, double cantidadVendida) {
         String sql = "UPDATE producto SET stock_actual = stock_actual - ? WHERE codigo_barras = ?";
 
         try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setInt(1, cantidadVendida);
+            ps.setDouble(1, cantidadVendida);
             ps.setString(2, codigoBarras);
 
             int filasAfectadas = ps.executeUpdate();
