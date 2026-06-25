@@ -12,6 +12,11 @@ import java.util.HashMap;
 import java.util.Map;
 import com.tienda.util.Sesion;
 import java.awt.Component;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GradientPaint;
+import java.awt.RenderingHints;
 
 
 public class VentasPanel extends javax.swing.JPanel {
@@ -26,6 +31,7 @@ public class VentasPanel extends javax.swing.JPanel {
     
     public VentasPanel() {
         initComponents();
+        this.setOpaque(false);
         configurarEstructuraCardLayout(); // Inicializa la navegación antes que los paneles internos
         
         // Crea el menú flotante
@@ -56,7 +62,7 @@ public class VentasPanel extends javax.swing.JPanel {
         jLabel1.putClientProperty("FlatLaf.style", "font: 20 'DearSans-Book'");
         jLabel1.setText("<html><body style='margin-top: 2px;'>" + Sesion.getInstancia().getNombreUsuario() + "</body></html>");
         
-        jLabel1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/user.svg", (float) 1.0));
+        jLabel1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/user1.svg", (float) 1.0));
         jTextField1.putClientProperty("JTextField.placeholderText", "Buscar por SKU o Código de Barras");
         cargarBotonesDinamicos();
         configurarAccionBotonTotal(); // Enlaza el evento click del botón total
@@ -71,12 +77,15 @@ public class VentasPanel extends javax.swing.JPanel {
 
         TOTALPanel = new JPanel();
         configurarTOTALPanelCheckout();
+        
 
         // Envolvemos el área de venta superior (Buscador, catálogo y carrito lateral)
         JPanel vistaVentasMesa = new JPanel(new BorderLayout());
+        this.setOpaque(false);
         
         // Contenedor superior para el buscador y el avatar del cajero
         JPanel panelCabecera = new JPanel(new BorderLayout());
+        this.setOpaque(false);
         panelCabecera.add(jTextField1, BorderLayout.CENTER);
         panelCabecera.add(jLabel1, BorderLayout.EAST);
 
@@ -127,6 +136,7 @@ public class VentasPanel extends javax.swing.JPanel {
         btnRegresar.addActionListener(e -> navegador.show(contenedorTarjetas, "PANTALLA_VENTAS"));
 
         JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        this.setOpaque(false);
         panelSuperior.add(btnRegresar);
         TOTALPanel.add(panelSuperior, BorderLayout.NORTH);
     }
@@ -139,9 +149,11 @@ public class VentasPanel extends javax.swing.JPanel {
         }
 
         JPanel panelCentralContenedor = new JPanel();
+        this.setOpaque(false);
         panelCentralContenedor.setLayout(new BoxLayout(panelCentralContenedor, BoxLayout.Y_AXIS));
 
         JPanel panelTicket = new JPanel();
+        
         panelTicket.setLayout(new BoxLayout(panelTicket, BoxLayout.Y_AXIS));
         panelTicket.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
         panelTicket.setBackground(Color.WHITE);
@@ -461,6 +473,31 @@ public class VentasPanel extends javax.swing.JPanel {
             });
         }
     }
+    @Override
+    protected void paintComponent(Graphics g) {
+        // Convertimos el objeto Graphics a Graphics2D para acceder a funciones avanzadas de renderizado
+        Graphics2D g2d = (Graphics2D) g.create();
+        
+        // Habilitar Antialiasing para que la transición de colores se vea fluida y limpia
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        // Definir los colores usando tus códigos Hexadecimales
+        Color colorInicio = Color.decode("#232AA8"); // Rosa arriba
+        Color colorFin = Color.decode("#9EB3FF");    // Azul abajo
+        
+        // Crear el degradado vertical: (0, 0) es la esquina superior, (0, getHeight()) es el límite inferior
+        GradientPaint degradadoVertical = new GradientPaint(
+                0, 0, colorInicio, 
+                0, getHeight(), colorFin
+        );
+        
+        // Aplicar el lienzo de pintura y rellenar el rectángulo de este panel
+        g2d.setPaint(degradadoVertical);
+        g2d.fillRect(0, 0, getWidth(), getHeight());
+        
+        g2d.dispose(); // Liberar los recursos gráficos inmediatamente
+        super.paintComponent(g);
+    }
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
@@ -477,24 +514,26 @@ public class VentasPanel extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
+        setMinimumSize(new java.awt.Dimension(860, 640));
+        setPreferredSize(new java.awt.Dimension(860, 640));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jTextField1.addActionListener(this::jTextField1ActionPerformed);
         add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 10, 640, 30));
         add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 210, -1, -1));
 
-        jPanel1.setBackground(new java.awt.Color(250, 247, 251));
+        jPanel1.setBackground(new java.awt.Color(222, 237, 255));
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        BotonTotal.setBackground(new java.awt.Color(71, 210, 165));
+        BotonTotal.setBackground(new java.awt.Color(255, 191, 236));
         BotonTotal.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         BotonTotal.addActionListener(this::BotonTotalActionPerformed);
-        jPanel1.add(BotonTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 600, 220, 48));
+        jPanel1.add(BotonTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 578, 250, 70));
 
         add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 60, 270, 660));
 
-        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel2.setBackground(new java.awt.Color(158, 179, 255));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         jScrollPane2.setViewportView(jPanel2);
 

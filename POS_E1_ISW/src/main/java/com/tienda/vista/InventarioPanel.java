@@ -13,6 +13,12 @@ import javax.swing.SpinnerNumberModel;
 import com.tienda.dao.ProductoDAO;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GradientPaint;
+import java.awt.RenderingHints;
+
 
 /**
  *
@@ -27,6 +33,7 @@ public class InventarioPanel extends javax.swing.JPanel {
         initComponents();
 
         // Crea el menú flotante
+        this.setOpaque(false);
         JPopupMenu menuUsuario = new JPopupMenu();
 
         //Crea la opción de cerrar sesión
@@ -58,8 +65,8 @@ public class InventarioPanel extends javax.swing.JPanel {
         // Meter el ítem al menú
         menuUsuario.add(itemCerrarSesion);
         //Establece la fuente a tamaño 56
-        jLabel2.putClientProperty("FlatLaf.style", "font: 56 'DearSans-Book'");
-        jLabel1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/admin.svg", (float) 3.0));
+        jLabel2.putClientProperty("FlatLaf.style", "font: 56 'Arial Rounded MT Bold'");
+        jLabel1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/adminblanco.svg", (float) 2.0));
         // Centrar el contenido (icono + texto) horizontalmente
 //        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 //
@@ -107,6 +114,31 @@ public class InventarioPanel extends javax.swing.JPanel {
             modelo.addRow(fila);
         }
     }
+    @Override
+    protected void paintComponent(Graphics g) {
+        // Convertimos el objeto Graphics a Graphics2D para acceder a funciones avanzadas de renderizado
+        Graphics2D g2d = (Graphics2D) g.create();
+        
+        // Habilitar Antialiasing para que la transición de colores se vea fluida y limpia
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        // Definir los colores usando tus códigos Hexadecimales
+        Color colorInicio = Color.decode("#232AA8"); // Rosa arriba
+        Color colorFin = Color.decode("#DEEDFF");    // Azul abajo
+        
+        // Crear el degradado vertical: (0, 0) es la esquina superior, (0, getHeight()) es el límite inferior
+        GradientPaint degradadoVertical = new GradientPaint(
+                0, 0, colorInicio, 
+                0, getHeight(), colorFin
+        );
+        
+        // Aplicar el lienzo de pintura y rellenar el rectángulo de este panel
+        g2d.setPaint(degradadoVertical);
+        g2d.fillRect(0, 0, getWidth(), getHeight());
+        
+        g2d.dispose(); // Liberar los recursos gráficos inmediatamente
+        super.paintComponent(g);
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -135,6 +167,7 @@ public class InventarioPanel extends javax.swing.JPanel {
 
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Administrador");
         jLabel2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
