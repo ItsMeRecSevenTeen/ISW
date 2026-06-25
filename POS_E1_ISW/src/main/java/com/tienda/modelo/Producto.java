@@ -12,6 +12,9 @@ public class Producto {
     
     // Declaramos las variables privadas (Variables de la DB)
     private String nombre;
+    private String sku;
+    private boolean esGranel;
+    private double precioPorKg;
     private double precioVenta;
     private String codigoBarras;
     
@@ -20,28 +23,45 @@ public class Producto {
     // Constructor vacío obligatorio
     public Producto() {
     }
-
     // GETTERS Y SETTERS 
     public String getNombre() {
         return this.nombre;
     }
-
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+    
+    public String getSku() {
+        return this.sku;
+    }
+    public void setSku(String sku) {
+        this.sku = sku;
+    }
+    
+    public boolean isEsGranel() {
+        return esGranel;
+    }
+    public void setEsGranel(boolean esGranel) {
+        this.esGranel = esGranel;
     }
     
     public String getCodigoBarras() {
         return this.codigoBarras;
     }
-    
     public void setCodigoBarras(String codigoBarras) {
         this.codigoBarras = codigoBarras;
+    }
+    
+    public double getPrecioPorKg() {
+        return this.precioPorKg;
+    }
+    public void setPrecioPorKg(double precioPorKg) {
+        this.precioPorKg = precioPorKg;
     }
 
     public double getPrecioVenta() {
         return this.precioVenta;
     }
-
     public void setPrecioVenta(double precioVenta) {
         this.precioVenta = precioVenta;
     }
