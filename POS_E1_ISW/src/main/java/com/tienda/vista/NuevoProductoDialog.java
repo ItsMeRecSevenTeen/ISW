@@ -27,6 +27,9 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
     private InventarioPanel panelInventario;
     // null = alta de producto nuevo; no null = edición del producto con ese id
     private Integer idProductoEditar;
+    // RF-05: venta a granel (se vende por Kg en vez de por pieza)
+    private final javax.swing.JCheckBox esGranelCheck = new javax.swing.JCheckBox("Producto a granel (se vende por Kg)");
+    private final javax.swing.JTextField precioPorKgField = new javax.swing.JTextField();
 
     public NuevoProductoDialog(java.awt.Frame parent, boolean modal, InventarioPanel panelInventario) {
         this(parent, modal, panelInventario, null);
@@ -74,6 +77,20 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
 //jButton2.putClientProperty("JButton.buttonType", "roundRect");
         agregarTipo.putClientProperty("FlatLaf.style", "font: 15 'DearSans-Book'");
         agregarTipo.setText("<html><body style='margin-top: 2px;'>Agregar tipo</body></html>");
+
+        // RF-05: checkbox + campo de precio por Kg para productos a granel
+        sanitizarCampo(precioPorKgField, regexDecimal, 10);
+        precioPorKgField.putClientProperty("JTextField.placeholderText", "Precio por Kg");
+        precioPorKgField.setEnabled(false);
+        esGranelCheck.addActionListener(e -> {
+            precioPorKgField.setEnabled(esGranelCheck.isSelected());
+            if (!esGranelCheck.isSelected()) {
+                precioPorKgField.setText("");
+            }
+        });
+        getContentPane().add(esGranelCheck, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 405, 350, -1));
+        getContentPane().add(precioPorKgField, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 432, 150, -1));
+
         setLocationRelativeTo(parent);
 
         if (idProductoEditar != null) {
@@ -100,6 +117,10 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
         CodigoBarras.setText(prod.getCodigoBarras());
         SKUgen.setText(prod.getSku());
 
+        esGranelCheck.setSelected(prod.isEsGranel());
+        precioPorKgField.setEnabled(prod.isEsGranel());
+        precioPorKgField.setText(prod.isEsGranel() ? String.format("%.2f", prod.getPrecioPorKg()) : "");
+
         // tipo_producto no se persiste en la BD; se fija un valor válido para no bloquear el guardado
         if (tipoProducto.getItemCount() > 1) {
             tipoProducto.setSelectedIndex(1);
@@ -116,9 +137,12 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
     stock.setText("");
     stockMinimo1.setText("");
     CodigoBarras.setText("");
-    
+    esGranelCheck.setSelected(false);
+    precioPorKgField.setText("");
+    precioPorKgField.setEnabled(false);
+
     // Reseteamos el SKU a su estado inicial
-    SKUgen.setText("---"); 
+    SKUgen.setText("---");
     
     // Si tu combo de tipo de producto tiene elementos, puedes regresarlo al primero:
     if (tipoProducto.getItemCount() > 0) {
@@ -300,6 +324,13 @@ private void sanitizarCampo(javax.swing.JTextField campo, String regex, int maxL
             javax.swing.JOptionPane.showMessageDialog(this, "Todos los campos son requeridos, incluyendo el Código de Barras", "Campos vacíos", javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
+
+        if (esGranelCheck.isSelected() && precioPorKgField.getText().trim().isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Ingrese el precio por Kg para un producto a granel.", "Campo requerido", javax.swing.JOptionPane.WARNING_MESSAGE);
+            precioPorKgField.requestFocus();
+            return;
+        }
+
         try {
             // 1. Convertimos los textos a números reales (decimales: la BD usa DECIMAL(10,2) para soportar granel)
             double cantStockMinimo = Double.parseDouble(stockMinimo1.getText().trim());
@@ -334,12 +365,15 @@ private void sanitizarCampo(javax.swing.JTextField campo, String regex, int maxL
             double dStockActual = Double.parseDouble(stock.getText().trim());
             double dStockMinimo = Double.parseDouble(stockMinimo1.getText().trim());
 
+            boolean esGranel = esGranelCheck.isSelected();
+            double dPrecioPorKg = esGranel ? Double.parseDouble(precioPorKgField.getText().trim()) : 0.0;
+
             // --- GUARDADO EN BASE DE DATOS ---
             com.tienda.dao.ProductoDAO prodDAO = new com.tienda.dao.ProductoDAO();
             boolean esEdicion = idProductoEditar != null;
             boolean guardadoExitoso = esEdicion
-                    ? prodDAO.actualizarProducto(idProductoEditar, sku, nombreProd, dPrecioCompra, dPrecioVenta, dStockActual, dStockMinimo, codBarras, contenidoNeto, marcaProd)
-                    : prodDAO.guardarProducto(sku, nombreProd, dPrecioCompra, dPrecioVenta, dStockActual, dStockMinimo, codBarras, contenidoNeto, marcaProd);
+                    ? prodDAO.actualizarProducto(idProductoEditar, sku, nombreProd, dPrecioCompra, dPrecioVenta, dStockActual, dStockMinimo, codBarras, contenidoNeto, marcaProd, esGranel, dPrecioPorKg)
+                    : prodDAO.guardarProducto(sku, nombreProd, dPrecioCompra, dPrecioVenta, dStockActual, dStockMinimo, codBarras, contenidoNeto, marcaProd, esGranel, dPrecioPorKg);
 
             if (guardadoExitoso) {
                 javax.swing.JOptionPane.showMessageDialog(this, esEdicion ? "Producto actualizado correctamente" : "Producto registrado y guardado correctamente");
