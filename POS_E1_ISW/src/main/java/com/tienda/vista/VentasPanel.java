@@ -182,7 +182,9 @@ public class VentasPanel extends javax.swing.JPanel {
 
             String textoCantidad = (cantidad % 1 == 0) ? String.format("%.0f", cantidad) : String.format("%.3f", cantidad);
             
-            JLabel lblProd = new JLabel(fila.nombreProd + " (x" + textoCantidad + ")");
+            String nombreTicket = fila.nombreProd.length() > 18 ? fila.nombreProd.substring(0, 17) + "…" : fila.nombreProd;
+            JLabel lblProd = new JLabel(nombreTicket + " (x" + textoCantidad + ")");
+            lblProd.setToolTipText(fila.nombreProd);
             lblProd.setFont(new Font("Monospaced", Font.PLAIN, 13));
 
             JLabel lblPrecio = new JLabel("$" + String.format("%.2f", subtotal));
@@ -472,12 +474,16 @@ private void agregarOIncrementarProducto(String nombre, double precio, String co
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.insets = new Insets(0, 4, 0, 4);
 
-            JLabel lblNombre = new JLabel(nombre);
+            // Truncamos nombres largos: sin límite, el JLabel exige su ancho completo de texto
+            // y GridBagLayout termina escondiendo el spinner y el precio en este renglón angosto.
+            String nombreMostrado = nombre.length() > 18 ? nombre.substring(0, 17) + "…" : nombre;
+            JLabel lblNombre = new JLabel(nombreMostrado);
+            lblNombre.setToolTipText(nombre);
             lblNombre.setFont(new Font("Arial", Font.BOLD, 11));
             gbc.gridx = 0;
-            gbc.weightx = 1.0; 
+            gbc.weightx = 1.0;
             gbc.fill = GridBagConstraints.HORIZONTAL;
-            gbc.anchor = GridBagConstraints.WEST; 
+            gbc.anchor = GridBagConstraints.WEST;
             this.add(lblNombre, gbc);
 
             SpinnerNumberModel modelo = new SpinnerNumberModel(cantidadInicial, 0.0, 999.0, 1.0);

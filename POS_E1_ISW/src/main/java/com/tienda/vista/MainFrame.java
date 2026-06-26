@@ -19,6 +19,29 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public MainFrame() {
         initComponents();
+
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                confirmarCierre();
+            }
+        });
+    }
+
+    // Evita que Alt+F4 o el botón de cerrar tiren la aplicación sin avisar,
+    // dejando un turno de caja abierto o una venta a medias en curso.
+    private void confirmarCierre() {
+        boolean turnoAbierto = com.tienda.util.Sesion.getInstancia().getIdTurno() > 0;
+
+        String mensaje = turnoAbierto
+                ? "Tienes un turno de caja abierto. Si cierras la aplicación sin hacer el cierre de caja, "
+                        + "el turno quedará abierto en el sistema. ¿Deseas salir de todos modos?"
+                : "¿Seguro que deseas cerrar la aplicación?";
+
+        boolean confirmado = ConfirmacionDialog.confirmarAccionDestructiva(this, "Confirmación", mensaje, "Salir");
+        if (confirmado) {
+            System.exit(0);
+        }
     }
     public void cambiarPanel(JPanel nuevoPanel) {
         this.getContentPane().removeAll();  // Borra el panel actual (LoginPanel)
@@ -37,7 +60,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         loginPanel1 = new com.tienda.vista.LoginPanel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         getContentPane().add(loginPanel1, java.awt.BorderLayout.CENTER);
 
         pack();
