@@ -6,6 +6,11 @@ package com.tienda.vista;
 
 import com.tienda.dao.UsuarioDAO;
 import javax.swing.JOptionPane;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GradientPaint;
+import java.awt.RenderingHints;
 
 /**
  *
@@ -18,14 +23,16 @@ public class AdminLoginPanel extends javax.swing.JPanel {
      */
     public AdminLoginPanel() {
         initComponents();
+        this.setOpaque(false);
         // Asociar la tecla enter con envío de credenciales
         jTextField1.addActionListener(e -> jButton2ActionPerformed(null));
         jPasswordField1.addActionListener(e -> jButton2ActionPerformed(null));
         
-        jButton1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/backward.svg", 24, 24));
-        jLabel1.putClientProperty("FlatLaf.style", "font: 56 'DearSans-Book'");
+        jButton1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/gback.svg", 24, 24));
         
-        jLabel1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/admin.svg", (float) 6.0));
+        jLabel1.putClientProperty("FlatLaf.style", "font: 56 'Arial Rounded MT Bold'");
+        
+        jLabel1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/adminblanco.svg", (float) 4.0));
         // Centrar el contenido (icono + texto) horizontalmente
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
@@ -34,7 +41,7 @@ public class AdminLoginPanel extends javax.swing.JPanel {
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         // Darle espacio de separación entre el icono y el texto
-        jLabel1.setIconTextGap(20);
+        jLabel1.setIconTextGap(0);
         
         // Icono de checkmark para enviar la contraseña
         jButton2.putClientProperty("JButton.buttonType", "roundRect");
@@ -46,6 +53,35 @@ public class AdminLoginPanel extends javax.swing.JPanel {
         // Placeholders
         jTextField1.putClientProperty("JTextField.placeholderText", "Ingrese su usuario");
         jPasswordField1.putClientProperty("JTextField.placeholderText", "Ingrese su contraseña");
+
+        // nombre_usuario es VARCHAR(50) en la BD
+        com.tienda.util.Sanitizador.limitarTexto(jTextField1, "^[a-zA-Z0-9_.\\-]*$", 50);
+        com.tienda.util.Sanitizador.limitarLongitud(jPasswordField1, 100);
+    }
+    @Override
+    protected void paintComponent(Graphics g) {
+        // Convertimos el objeto Graphics a Graphics2D para acceder a funciones avanzadas de renderizado
+        Graphics2D g2d = (Graphics2D) g.create();
+        
+        // Habilitar Antialiasing para que la transición de colores se vea fluida y limpia
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        // Definir los colores usando tus códigos Hexadecimales
+        Color colorInicio = Color.decode("#232AA8"); // Rosa arriba
+        Color colorFin = Color.decode("#9EB3FF");    // Azul abajo
+        
+        // Crear el degradado vertical: (0, 0) es la esquina superior, (0, getHeight()) es el límite inferior
+        GradientPaint degradadoVertical = new GradientPaint(
+                0, 0, colorInicio, 
+                0, getHeight(), colorFin
+        );
+        
+        // Aplicar el lienzo de pintura y rellenar el rectángulo de este panel
+        g2d.setPaint(degradadoVertical);
+        g2d.fillRect(0, 0, getWidth(), getHeight());
+        
+        g2d.dispose(); // Liberar los recursos gráficos inmediatamente
+        super.paintComponent(g);
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -64,8 +100,11 @@ public class AdminLoginPanel extends javax.swing.JPanel {
 
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Administrador");
+        jLabel1.setToolTipText("");
+        jLabel1.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jLabel1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 140, 510, 400));
@@ -73,6 +112,9 @@ public class AdminLoginPanel extends javax.swing.JPanel {
         jPasswordField1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         add(jPasswordField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 600, 240, -1));
 
+        jButton1.setBackground(new java.awt.Color(222, 237, 255));
+        jButton1.setFont(new java.awt.Font("Helvetica Neue", 1, 13)); // NOI18N
+        jButton1.setForeground(new java.awt.Color(27, 34, 166));
         jButton1.setText("Atrás");
         jButton1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);

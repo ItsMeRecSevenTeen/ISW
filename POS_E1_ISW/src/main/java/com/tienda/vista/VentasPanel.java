@@ -12,6 +12,11 @@ import java.util.HashMap;
 import java.util.Map;
 import com.tienda.util.Sesion;
 import java.awt.Component;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GradientPaint;
+import java.awt.RenderingHints;
 
 
 public class VentasPanel extends javax.swing.JPanel {
@@ -26,6 +31,7 @@ public class VentasPanel extends javax.swing.JPanel {
     
     public VentasPanel() {
         initComponents();
+        this.setOpaque(false);
         configurarEstructuraCardLayout(); // Inicializa la navegación antes que los paneles internos
         
         // Crea el menú flotante
@@ -56,7 +62,7 @@ public class VentasPanel extends javax.swing.JPanel {
         jLabel1.putClientProperty("FlatLaf.style", "font: 20 'DearSans-Book'");
         jLabel1.setText("<html><body style='margin-top: 2px;'>" + Sesion.getInstancia().getNombreUsuario() + "</body></html>");
         
-        jLabel1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/user.svg", (float) 1.0));
+        jLabel1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/user1.svg", (float) 1.0));
         jTextField1.putClientProperty("JTextField.placeholderText", "Buscar por SKU o Código de Barras");
         cargarBotonesDinamicos();
         configurarAccionBotonTotal(); // Enlaza el evento click del botón total
@@ -71,12 +77,15 @@ public class VentasPanel extends javax.swing.JPanel {
 
         TOTALPanel = new JPanel();
         configurarTOTALPanelCheckout();
+        
 
         // Envolvemos el área de venta superior (Buscador, catálogo y carrito lateral)
         JPanel vistaVentasMesa = new JPanel(new BorderLayout());
+        this.setOpaque(false);
         
         // Contenedor superior para el buscador y el avatar del cajero
         JPanel panelCabecera = new JPanel(new BorderLayout());
+        this.setOpaque(false);
         panelCabecera.add(jTextField1, BorderLayout.CENTER);
         panelCabecera.add(jLabel1, BorderLayout.EAST);
 
@@ -127,8 +136,24 @@ public class VentasPanel extends javax.swing.JPanel {
         btnRegresar.addActionListener(e -> navegador.show(contenedorTarjetas, "PANTALLA_VENTAS"));
 
         JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        this.setOpaque(false);
         panelSuperior.add(btnRegresar);
         TOTALPanel.add(panelSuperior, BorderLayout.NORTH);
+    }
+
+    private JPanel crearRenglonTicket(String etiqueta, double monto, int estiloFuente) {
+        JPanel renglon = new JPanel(new BorderLayout());
+        renglon.setBackground(Color.WHITE);
+
+        JLabel lblEtiqueta = new JLabel(etiqueta);
+        lblEtiqueta.setFont(new Font("Monospaced", estiloFuente, 13));
+
+        JLabel lblMonto = new JLabel("$" + String.format("%.2f", monto));
+        lblMonto.setFont(new Font("Monospaced", estiloFuente, 13));
+
+        renglon.add(lblEtiqueta, BorderLayout.WEST);
+        renglon.add(lblMonto, BorderLayout.EAST);
+        return renglon;
     }
 
     private void construirDesgloseEnTOTALPanel() {
@@ -139,9 +164,11 @@ public class VentasPanel extends javax.swing.JPanel {
         }
 
         JPanel panelCentralContenedor = new JPanel();
+        this.setOpaque(false);
         panelCentralContenedor.setLayout(new BoxLayout(panelCentralContenedor, BoxLayout.Y_AXIS));
 
         JPanel panelTicket = new JPanel();
+        
         panelTicket.setLayout(new BoxLayout(panelTicket, BoxLayout.Y_AXIS));
         panelTicket.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
         panelTicket.setBackground(Color.WHITE);
@@ -173,18 +200,16 @@ public class VentasPanel extends javax.swing.JPanel {
         panelTicket.add(separador);
         panelTicket.add(Box.createRigidArea(new Dimension(0, 8)));
 
-        JPanel renglonTotal = new JPanel(new BorderLayout());
-        renglonTotal.setBackground(Color.WHITE);
-        
-        JLabel lblTextoTotal = new JLabel("Total:");
-        lblTextoTotal.setFont(new Font("Monospaced", Font.BOLD, 15));
-        
-        JLabel lblValorTotal = new JLabel("$" + String.format("%.2f", costoTotal));
-        lblValorTotal.setFont(new Font("Monospaced", Font.BOLD, 15));
+        // RNF-04: el total de la venta incluye el desglose del IVA leído desde configuración (RI-05)
+        int ivaPorcentaje = new com.tienda.dao.ConfiguracionDAO().getIVA();
+        double ivaMonto = costoTotal * ivaPorcentaje / 100.0;
+        double totalConIva = costoTotal + ivaMonto;
 
-        renglonTotal.add(lblTextoTotal, BorderLayout.WEST);
-        renglonTotal.add(lblValorTotal, BorderLayout.EAST);
-        panelTicket.add(renglonTotal);
+        panelTicket.add(crearRenglonTicket("Subtotal:", costoTotal, Font.PLAIN));
+        panelTicket.add(Box.createRigidArea(new Dimension(0, 3)));
+        panelTicket.add(crearRenglonTicket("IVA (" + ivaPorcentaje + "%):", ivaMonto, Font.PLAIN));
+        panelTicket.add(Box.createRigidArea(new Dimension(0, 5)));
+        panelTicket.add(crearRenglonTicket("Total:", totalConIva, Font.BOLD));
 
         JScrollPane scrollTicket = new JScrollPane(panelTicket);
         scrollTicket.setPreferredSize(new Dimension(300, 160));
@@ -203,7 +228,7 @@ public class VentasPanel extends javax.swing.JPanel {
 
         JButton btnTarjeta = new JButton("Tarjeta 💳");
         btnTarjeta.setFont(new Font("Arial", Font.BOLD, 12));
-        btnTarjeta.addActionListener(e -> finalizarTransaccion("Tarjeta"));
+        btnTarjeta.addActionListener(e -> finalizarTransaccion("Tarjeta", ivaPorcentaje, ivaMonto, totalConIva, totalConIva, 0));
 
         // Lógica de transición de cobro por Efectivo
         btnEfectivo.addActionListener(e -> {
@@ -215,6 +240,7 @@ public class VentasPanel extends javax.swing.JPanel {
             JTextField txtEfectivo = new JTextField();
             txtEfectivo.putClientProperty("JTextField.placeholderText", "Efectivo recibido");
             txtEfectivo.setFont(new Font("Arial", Font.PLAIN, 13));
+            com.tienda.util.Sanitizador.limitarTexto(txtEfectivo, "^\\d*(\\.\\d{0,2})?$", 10);
 
             JButton btnCalcularCambio = new JButton("Aceptar");
             btnCalcularCambio.setFont(new Font("Arial", Font.BOLD, 12));
@@ -228,12 +254,12 @@ public class VentasPanel extends javax.swing.JPanel {
             btnCalcularCambio.addActionListener(evt -> {
                 try {
                     double efectivo = Double.parseDouble(txtEfectivo.getText().trim());
-                    if (efectivo < costoTotal) {
+                    if (efectivo < totalConIva) {
                         JOptionPane.showMessageDialog(TOTALPanel, "El efectivo ingresado es insuficiente.", "Dinero insuficiente", JOptionPane.WARNING_MESSAGE);
                         return;
                     }
 
-                    double cambio = efectivo - costoTotal;
+                    double cambio = efectivo - totalConIva;
 
                     txtEfectivo.setEditable(false);
                     btnCalcularCambio.setEnabled(false);
@@ -248,7 +274,7 @@ public class VentasPanel extends javax.swing.JPanel {
                     btnFinalizarEfectivo.setFont(new Font("Arial", Font.BOLD, 13));
                     btnFinalizarEfectivo.setMaximumSize(new Dimension(300, 40));
                     btnFinalizarEfectivo.setAlignmentX(Component.CENTER_ALIGNMENT);
-                    btnFinalizarEfectivo.addActionListener(ev -> finalizarTransaccion("Efectivo"));
+                    btnFinalizarEfectivo.addActionListener(ev -> finalizarTransaccion("Efectivo", ivaPorcentaje, ivaMonto, totalConIva, efectivo, cambio));
 
                     panelAccionPago.add(Box.createRigidArea(new Dimension(0, 10)));
                     panelAccionPago.add(panelCambioResultado);
@@ -282,8 +308,28 @@ public class VentasPanel extends javax.swing.JPanel {
         TOTALPanel.repaint();
     }
 
-    private void finalizarTransaccion(String metodoPago) {
-        com.tienda.dao.ProductoDAO prodDAO = new com.tienda.dao.ProductoDAO();
+    private void finalizarTransaccion(String metodoPago, double ivaPorcentaje, double ivaMonto, double totalConIva, double montoRecibido, double cambio) {
+        // 1. Armar y registrar la venta + su detalle en una sola transacción (RF-04, RF-07, RNF-07)
+        com.tienda.modelo.Venta venta = new com.tienda.modelo.Venta();
+        venta.setIdUsuario(com.tienda.util.Sesion.getInstancia().getIdCajero());
+        venta.setIdTurno(com.tienda.util.Sesion.getInstancia().getIdTurno());
+        venta.setTotalSinIva(costoTotal);
+        venta.setIvaPorcentaje(ivaPorcentaje);
+        venta.setIvaMonto(ivaMonto);
+        venta.setTotal(totalConIva);
+        venta.setMontoRecibido(montoRecibido);
+        venta.setCambio(cambio);
+        venta.setCompletada(true);
+
+        for (FilaProducto fila : productosAgregados.values()) {
+            double cantidadVendida = ((Number) fila.spinnerCantidad.getValue()).doubleValue();
+            venta.getDetalles().add(new com.tienda.modelo.DetalleVenta(fila.idProducto, cantidadVendida, fila.precioUnitario));
+        }
+
+        com.tienda.dao.VentaDAO ventaDAO = new com.tienda.dao.VentaDAO();
+        int idVenta = ventaDAO.registrarVenta(venta);
+
+    com.tienda.dao.ProductoDAO prodDAO = new com.tienda.dao.ProductoDAO();
     boolean todoActualizado = true;
 
     // 2. Recorrer los productos del carrito y restar el stock en la BD
@@ -293,28 +339,34 @@ public class VentasPanel extends javax.swing.JPanel {
 
         // Ejecutar la actualización en la base de datos
         boolean exito = prodDAO.restarInventario(codigoBarras, cantidadVendida);
-        
+
         if (!exito) {
             todoActualizado = false; // Si uno falla, registramos el inconveniente
         }
     }
 
-    // 3. Mostrar mensaje de éxito según el resultado del inventario
-    if (todoActualizado) {
+    if (idVenta > 0) {
+        new com.tienda.dao.TurnoCajaDAO().sumarVenta(venta.getIdTurno(), totalConIva);
+    }
+
+    // 3. Mostrar mensaje de éxito según el resultado del inventario y del registro de la venta
+    if (idVenta > 0 && todoActualizado) {
         JOptionPane.showMessageDialog(this, "Transacción completada y stock actualizado vía: " + metodoPago, "Venta Exitosa", JOptionPane.INFORMATION_MESSAGE);
+    } else if (idVenta <= 0) {
+        JOptionPane.showMessageDialog(this, "No se pudo registrar la venta en la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
     } else {
         JOptionPane.showMessageDialog(this, "Venta realizada, pero hubo un problema al actualizar algunos productos en el inventario.", "Advertencia", JOptionPane.WARNING_MESSAGE);
     }
-    
+
     // 4. Limpiar la mesa de venta y regresar al catálogo
     productosAgregados.clear();
     panelListaProductos.removeAll();
     costoTotal = 0.0;
     actualizarBotonTotal();
-    
+
     // 5. Refrescar los botones del catálogo para que muestren datos reales (Opcional)
-    cargarBotonesDinamicos(); 
-    
+    cargarBotonesDinamicos();
+
     navegador.show(contenedorTarjetas, "PANTALLA_VENTAS");
 }
 
@@ -327,6 +379,7 @@ public class VentasPanel extends javax.swing.JPanel {
             String nombreProducto = prod.getNombre();
             double precioProducto = prod.getPrecioVenta();
             String codigoBarrasProducto = prod.getCodigoBarras();
+            int idProductoCatalogo = prod.getIdProducto();
 
             JButton boton = new JButton("<html><center>" + nombreProducto + "</center></html>");
             Dimension dimensionBoton = new Dimension(90, 90);
@@ -336,7 +389,7 @@ public class VentasPanel extends javax.swing.JPanel {
             boton.setFont(new Font("Arial", Font.BOLD, 10));
             boton.setMargin(new Insets(2, 2, 2, 2));
 
-            boton.addActionListener(e -> agregarOIncrementarProducto(nombreProducto, precioProducto, codigoBarrasProducto));
+            boton.addActionListener(e -> agregarOIncrementarProducto(nombreProducto, precioProducto, codigoBarrasProducto, idProductoCatalogo));
 
             panelContenedor.add(boton);
         }
@@ -346,7 +399,7 @@ public class VentasPanel extends javax.swing.JPanel {
         panelContenedor.repaint();
     }
 
-private void agregarOIncrementarProducto(String nombre, double precio, String codigoBarras) {
+private void agregarOIncrementarProducto(String nombre, double precio, String codigoBarras, int idProducto) {
         if (productosAgregados.containsKey(nombre)) {
             FilaProducto fila = productosAgregados.get(nombre);
             // 1. Extraemos el valor de forma segura como double
@@ -355,14 +408,14 @@ private void agregarOIncrementarProducto(String nombre, double precio, String co
             fila.spinnerCantidad.setValue(cantidadActual + 1.0);
         } else {
             // 3. Agregamos el 1.0 como parámetro de 'cantidadInicial' al constructor
-            FilaProducto nuevaFila = new FilaProducto(nombre, precio, codigoBarras, 1.0);
+            FilaProducto nuevaFila = new FilaProducto(nombre, precio, codigoBarras, idProducto, 1.0);
             productosAgregados.put(nombre, nuevaFila);
             panelListaProductos.add(nuevaFila);
-            
+
             costoTotal += precio;
             actualizarBotonTotal();
         }
-        
+
         panelListaProductos.revalidate();
         panelListaProductos.repaint();
     }
@@ -378,7 +431,7 @@ private void agregarOIncrementarProducto(String nombre, double precio, String co
             fila.spinnerCantidad.setValue(valorActual + cantidad);
         } else {
             // Si es nuevo, lo mandamos a la fila con su cantidad inicial y su precio aplicado
-            FilaProducto nuevaFila = new FilaProducto(nombre, precioAplicado, prod.getCodigoBarras(), cantidad);
+            FilaProducto nuevaFila = new FilaProducto(nombre, precioAplicado, prod.getCodigoBarras(), prod.getIdProducto(), cantidad);
             panelListaProductos.add(nuevaFila);
             productosAgregados.put(nombre, nuevaFila);
 
@@ -402,12 +455,14 @@ private void agregarOIncrementarProducto(String nombre, double precio, String co
         private String nombreProd;
         private double cantidadAnterior;
         public String codigoBarras;
+        public int idProducto;
 
 
-        public FilaProducto(String nombre, double precio, String codigoBarras, double cantidadInicial) {
+        public FilaProducto(String nombre, double precio, String codigoBarras, int idProducto, double cantidadInicial) {
             this.nombreProd = nombre;
             this.precioUnitario = precio;
             this.codigoBarras = codigoBarras;
+            this.idProducto = idProducto;
             this.cantidadAnterior = cantidadInicial;
 
             this.setLayout(new GridBagLayout());
@@ -471,6 +526,31 @@ private void agregarOIncrementarProducto(String nombre, double precio, String co
             });
         }
     }
+    @Override
+    protected void paintComponent(Graphics g) {
+        // Convertimos el objeto Graphics a Graphics2D para acceder a funciones avanzadas de renderizado
+        Graphics2D g2d = (Graphics2D) g.create();
+        
+        // Habilitar Antialiasing para que la transición de colores se vea fluida y limpia
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        // Definir los colores usando tus códigos Hexadecimales
+        Color colorInicio = Color.decode("#232AA8"); // Rosa arriba
+        Color colorFin = Color.decode("#9EB3FF");    // Azul abajo
+        
+        // Crear el degradado vertical: (0, 0) es la esquina superior, (0, getHeight()) es el límite inferior
+        GradientPaint degradadoVertical = new GradientPaint(
+                0, 0, colorInicio, 
+                0, getHeight(), colorFin
+        );
+        
+        // Aplicar el lienzo de pintura y rellenar el rectángulo de este panel
+        g2d.setPaint(degradadoVertical);
+        g2d.fillRect(0, 0, getWidth(), getHeight());
+        
+        g2d.dispose(); // Liberar los recursos gráficos inmediatamente
+        super.paintComponent(g);
+    }
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
@@ -487,24 +567,26 @@ private void agregarOIncrementarProducto(String nombre, double precio, String co
         jLabel1 = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
+        setMinimumSize(new java.awt.Dimension(860, 640));
+        setPreferredSize(new java.awt.Dimension(860, 640));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jTextField1.addActionListener(this::jTextField1ActionPerformed);
         add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 10, 640, 30));
         add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 210, -1, -1));
 
-        jPanel1.setBackground(new java.awt.Color(250, 247, 251));
+        jPanel1.setBackground(new java.awt.Color(222, 237, 255));
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        BotonTotal.setBackground(new java.awt.Color(71, 210, 165));
+        BotonTotal.setBackground(new java.awt.Color(255, 191, 236));
         BotonTotal.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         BotonTotal.addActionListener(this::BotonTotalActionPerformed);
-        jPanel1.add(BotonTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 600, 220, 48));
+        jPanel1.add(BotonTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 578, 250, 70));
 
         add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 60, 270, 660));
 
-        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel2.setBackground(new java.awt.Color(158, 179, 255));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         jScrollPane2.setViewportView(jPanel2);
 
@@ -540,13 +622,19 @@ private void agregarOIncrementarProducto(String nombre, double precio, String co
                     return; // El usuario canceló la operación
                 }
 
-                try {
-                    cantidadAAgregar = Double.parseDouble(inputPeso);
-                    precioAplicado = productoEncontrado.getPrecioPorKg();
-                } catch (NumberFormatException e) {
-                    JOptionPane.showMessageDialog(this, "Peso no válido.");
+                // RNF-03: hasta 3 decimales; también rechaza negativos, notación científica, etc.
+                String pesoTexto = inputPeso.trim();
+                if (!pesoTexto.matches("^\\d{1,3}(\\.\\d{1,3})?$")) {
+                    JOptionPane.showMessageDialog(this, "Ingrese un peso válido en Kg (hasta 3 decimales).", "Peso no válido", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
+
+                cantidadAAgregar = Double.parseDouble(pesoTexto);
+                if (cantidadAAgregar <= 0) {
+                    JOptionPane.showMessageDialog(this, "El peso debe ser mayor a cero.", "Peso no válido", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                precioAplicado = productoEncontrado.getPrecioPorKg();
             }
 
                 // 3. Añadir al modelo del JTable del carrito

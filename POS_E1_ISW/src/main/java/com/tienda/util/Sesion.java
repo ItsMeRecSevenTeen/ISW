@@ -13,6 +13,7 @@ public class Sesion {
     private int idCajero; // Para guardar el ID de la base de datos
     private String nombreUsuario;
     private int rol; // Por si se necesita que admin o cajero lo use
+    private int idTurno; // Turno de caja abierto actualmente (0 = sin turno activo)
 
     // Constructor privado para que no usen el método afuera
     private Sesion() {}
@@ -33,9 +34,13 @@ public class Sesion {
     public int getRol() { return rol; }
     public void setRol(int rol) { this.rol = rol; }
 
+    public int getIdTurno() { return idTurno; }
+    public void setIdTurno(int idTurno) { this.idTurno = idTurno; }
+
     // Método para que cierre sesión
     public void cerrarSesion() {
         nombreUsuario = null;
         rol = 0;
+        idTurno = 0;
     }
 }

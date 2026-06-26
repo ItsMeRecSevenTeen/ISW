@@ -7,6 +7,12 @@ package com.tienda.vista;
 import com.tienda.dao.UsuarioDAO;
 import com.tienda.util.Sesion;
 import javax.swing.JOptionPane;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GradientPaint;
+import java.awt.RenderingHints;
+
 
 /**
  *
@@ -19,13 +25,14 @@ public class CajeroLoginPanel extends javax.swing.JPanel {
      */
     public CajeroLoginPanel() {
         initComponents();
+        this.setOpaque(false);
         // Asociar la tecla enter con envío de credenciales
         jTextField1.addActionListener(e -> jButton2ActionPerformed(null));
         jPasswordField1.addActionListener(e -> jButton2ActionPerformed(null));
 
         jButton1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/backward.svg", 24, 24));
-        jLabel1.putClientProperty("FlatLaf.style", "font: 56 'DearSans-Book'");
-        jLabel1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/user.svg", (float) 6.0));
+        jLabel1.putClientProperty("FlatLaf.style", "font: 56 'Arial Rounded MT Bold'");
+        jLabel1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/userblnco.svg", (float) 4.0));
         // Centrar el contenido (icono + texto) horizontalmente
         
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -34,7 +41,7 @@ public class CajeroLoginPanel extends javax.swing.JPanel {
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         // Darle espacio de separación entre el icono y el texto
-        jLabel1.setIconTextGap(20);
+        jLabel1.setIconTextGap(1);
         // Icono de checkmark para enviar la contraseña
         jButton2.putClientProperty("JButton.buttonType", "roundRect");
         jButton2.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/check.svg", 24, 24));
@@ -45,6 +52,35 @@ public class CajeroLoginPanel extends javax.swing.JPanel {
         // Placeholders
         jTextField1.putClientProperty("JTextField.placeholderText", "Ingrese su usuario");
         jPasswordField1.putClientProperty("JTextField.placeholderText", "Ingresa tu contraseña");
+
+        // nombre_usuario es VARCHAR(50) en la BD
+        com.tienda.util.Sanitizador.limitarTexto(jTextField1, "^[a-zA-Z0-9_.\\-]*$", 50);
+        com.tienda.util.Sanitizador.limitarLongitud(jPasswordField1, 100);
+    }
+    @Override
+    protected void paintComponent(Graphics g) {
+        // Convertimos el objeto Graphics a Graphics2D para acceder a funciones avanzadas de renderizado
+        Graphics2D g2d = (Graphics2D) g.create();
+        
+        // Habilitar Antialiasing para que la transición de colores se vea fluida y limpia
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        // Definir los colores usando tus códigos Hexadecimales
+        Color colorInicio = Color.decode("#1B22A6"); // Rosa arriba
+        Color colorFin = Color.decode("#FFFCDE");    // Azul abajo
+        
+        // Crear el degradado vertical: (0, 0) es la esquina superior, (0, getHeight()) es el límite inferior
+        GradientPaint degradadoVertical = new GradientPaint(
+                0, 0, colorInicio, 
+                0, getHeight(), colorFin
+        );
+        
+        // Aplicar el lienzo de pintura y rellenar el rectángulo de este panel
+        g2d.setPaint(degradadoVertical);
+        g2d.fillRect(0, 0, getWidth(), getHeight());
+        
+        g2d.dispose(); // Liberar los recursos gráficos inmediatamente
+        super.paintComponent(g);
     }
 
     /**
@@ -76,6 +112,7 @@ public class CajeroLoginPanel extends javax.swing.JPanel {
         jButton2.addActionListener(this::jButton2ActionPerformed);
         add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 600, 40, 40));
 
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Cajero");
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
