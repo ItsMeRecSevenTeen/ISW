@@ -55,10 +55,10 @@ public class ProductoDAO {
         }
         return listaProductos;
     }
-    public boolean guardarProducto(String sku, String nombre, double precioCompra, double precioVenta, double stockActual, double stockMinimo, String codigoBarras, String contenidoNeto, String marca) {
+    public boolean guardarProducto(String sku, String nombre, double precioCompra, double precioVenta, double stockActual, double stockMinimo, String codigoBarras, String contenidoNeto, String marca, boolean esGranel, double precioPorKg) {
 
         // Añadimos 'codigo_barras' a la consulta SQL
-        String sql = "INSERT INTO producto (sku, nombre, precio_compra, precio_venta, stock_actual, stock_minimo, codigo_barras, es_granel, contenido_neto, marca) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)";
+        String sql = "INSERT INTO producto (sku, nombre, precio_compra, precio_venta, stock_actual, stock_minimo, codigo_barras, es_granel, precio_por_kg, contenido_neto, marca) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = Conexion.getConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -68,9 +68,11 @@ public class ProductoDAO {
             pstmt.setDouble(4, precioVenta);
             pstmt.setDouble(5, stockActual);
             pstmt.setDouble(6, stockMinimo);
-            pstmt.setString(7, codigoBarras); 
-            pstmt.setString(8, contenidoNeto);
-            pstmt.setString(9, marca);
+            pstmt.setString(7, codigoBarras);
+            pstmt.setBoolean(8, esGranel);
+            pstmt.setDouble(9, precioPorKg);
+            pstmt.setString(10, contenidoNeto);
+            pstmt.setString(11, marca);
 
             int filasAfectadas = pstmt.executeUpdate();
             return filasAfectadas > 0;
@@ -191,10 +193,11 @@ public class ProductoDAO {
     }
 
     public boolean actualizarProducto(int idProducto, String sku, String nombre, double precioCompra, double precioVenta,
-            double stockActual, double stockMinimo, String codigoBarras, String contenidoNeto, String marca) {
+            double stockActual, double stockMinimo, String codigoBarras, String contenidoNeto, String marca, boolean esGranel, double precioPorKg) {
 
         String sql = "UPDATE producto SET sku = ?, nombre = ?, precio_compra = ?, precio_venta = ?, "
-                + "stock_actual = ?, stock_minimo = ?, codigo_barras = ?, contenido_neto = ?, marca = ? "
+                + "stock_actual = ?, stock_minimo = ?, codigo_barras = ?, contenido_neto = ?, marca = ?, "
+                + "es_granel = ?, precio_por_kg = ? "
                 + "WHERE id_producto = ?";
 
         try (Connection conn = Conexion.getConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -208,7 +211,9 @@ public class ProductoDAO {
             pstmt.setString(7, codigoBarras);
             pstmt.setString(8, contenidoNeto);
             pstmt.setString(9, marca);
-            pstmt.setInt(10, idProducto);
+            pstmt.setBoolean(10, esGranel);
+            pstmt.setDouble(11, precioPorKg);
+            pstmt.setInt(12, idProducto);
 
             int filasAfectadas = pstmt.executeUpdate();
             return filasAfectadas > 0;
