@@ -4,6 +4,11 @@
  */
 
 package com.tienda.vista;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GradientPaint;
+import java.awt.RenderingHints;
 
 /**
  *
@@ -15,19 +20,46 @@ public class LoginPanel extends javax.swing.JPanel {
     public LoginPanel() {
         initComponents(); // Netbeans crea los componentes aquí
         //Establece la fuente a tamaño 56
-        jLabel1.putClientProperty("FlatLaf.style", "font: 56 'DearSans-Book'");
+        this.setOpaque(false);
+        jLabel1.putClientProperty("FlatLaf.style", "font: 56 'Arial Rounded MT Bold'");
         //Redondeo de botón, es necesario que el botón tenga una proporción 1:1
         jButton1.putClientProperty("JButton.buttonType", "roundRect");
-        jButton1.putClientProperty("FlatLaf.style", "font: 46 'DearSans-Book'");
+        jButton1.putClientProperty("FlatLaf.style", "font: 43 'New Peninim MT'");
         jButton1.setFocusable(false); //Para que no se coloree el borde del botón
-        jButton1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/admin.svg", (float) 7.0));
+        jButton1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/adminn.svg", (float) 4.0));
         
-        jLabel2.putClientProperty("FlatLaf.style", "font: 36 'DearSans-Book'");
+        jLabel2.putClientProperty("FlatLaf.style", "font: 36 'Arial Rounded MT Bold'");
         
         jButton2.putClientProperty("JButton.buttonType", "roundRect");
-        jButton2.putClientProperty("FlatLaf.style", "font: 46 'DearSans-Book'");
-        jButton2.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/user.svg", (float) 7.0));
+        jButton2.putClientProperty("FlatLaf.style", "font: 43 'New Peninim MT'");
+        jButton2.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/user1.svg", (float) 4.0));
         jButton2.setFocusable(false);
+        
+    }
+    @Override
+    protected void paintComponent(Graphics g) {
+        // Convertimos el objeto Graphics a Graphics2D para acceder a funciones avanzadas de renderizado
+        Graphics2D g2d = (Graphics2D) g.create();
+        
+        // Habilitar Antialiasing para que la transición de colores se vea fluida y limpia
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        // Definir los colores usando tus códigos Hexadecimales
+        Color colorInicio = Color.decode("#9EB3FF"); // Rosa arriba
+        Color colorFin = Color.decode("#232AA8");    // Azul abajo
+        
+        // Crear el degradado vertical: (0, 0) es la esquina superior, (0, getHeight()) es el límite inferior
+        GradientPaint degradadoVertical = new GradientPaint(
+                0, 0, colorInicio, 
+                0, getHeight(), colorFin
+        );
+        
+        // Aplicar el lienzo de pintura y rellenar el rectángulo de este panel
+        g2d.setPaint(degradadoVertical);
+        g2d.fillRect(0, 0, getWidth(), getHeight());
+        
+        g2d.dispose(); // Liberar los recursos gráficos inmediatamente
+        super.paintComponent(g);
     }
 
     /** This method is called from within the constructor to
@@ -44,16 +76,23 @@ public class LoginPanel extends javax.swing.JPanel {
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
+        setBackground(new java.awt.Color(165, 104, 188));
+
+        jLabel1.setBackground(new java.awt.Color(250, 247, 251));
+        jLabel1.setFont(new java.awt.Font("New Peninim MT", 0, 48)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("BIENVENIDO");
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("IDENTIFICARSE");
 
+        jButton1.setBackground(new java.awt.Color(222, 237, 255));
         jButton1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jButton1.setText("Administrador");
+        jButton1.setForeground(new java.awt.Color(27, 34, 166));
+        jButton1.setText("ADMINISTRADOR");
         jButton1.setToolTipText("");
         jButton1.setFocusable(false);
         jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -61,8 +100,10 @@ public class LoginPanel extends javax.swing.JPanel {
         jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jButton1.addActionListener(this::jButton1ActionPerformed);
 
+        jButton2.setBackground(new java.awt.Color(222, 237, 255));
         jButton2.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
-        jButton2.setText("Cajero");
+        jButton2.setForeground(new java.awt.Color(27, 34, 166));
+        jButton2.setText("CAJERO");
         jButton2.setFocusable(false);
         jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton2.setIconTextGap(30);
@@ -78,14 +119,14 @@ public class LoginPanel extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(82, 82, 82)
                         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(50, 50, 50)
+                        .addGap(54, 54, 54)
                         .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(400, 400, 400)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE))))
-                .addContainerGap(63, Short.MAX_VALUE))
+                .addContainerGap(59, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -98,7 +139,7 @@ public class LoginPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(44, Short.MAX_VALUE))
+                .addContainerGap(52, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     

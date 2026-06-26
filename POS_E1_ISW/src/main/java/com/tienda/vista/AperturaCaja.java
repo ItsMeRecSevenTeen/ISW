@@ -11,21 +11,28 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GradientPaint;
+import java.awt.RenderingHints;
 public class AperturaCaja extends javax.swing.JPanel {
     UsuarioDAO usuarioDao = new UsuarioDAO();
     public AperturaCaja() {
         initComponents();
        // Asociar la tecla enter con envío de credenciales
+       this.setOpaque(false);
         jTextField1.addActionListener(e -> jButton2ActionPerformed(null));
         
-        jButton1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/backward.svg", 24, 24));
-        jLabel1.putClientProperty("FlatLaf.style", "font: 56 'DearSans-Book'");
-        jLabel1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/user.svg", (float) 6.0));
+        jButton1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/gback.svg", 24, 24));
+        jLabel1.putClientProperty("FlatLaf.style", "font: 56 'Arial Rounded MT Bold'");
+        jLabel1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/userblnco.svg", (float) 4.0));
         // Centrar el contenido (icono + texto) horizontalmente
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         // Mover el texto abajo del icono
-        jLabel1.setVerticalTextPosition(javax.swing.SwingConstants.CENTER);
-        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        jLabel1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jLabel1.setIconTextGap(1);
         // Icono de checkmark para enviar la contraseña
         jButton2.putClientProperty("JButton.buttonType", "roundRect");
         jButton2.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/check.svg", 24, 24));
@@ -61,7 +68,31 @@ public class AperturaCaja extends javax.swing.JPanel {
         jTextField1.requestFocus();
     }
     
-
+@Override
+    protected void paintComponent(Graphics g) {
+        // Convertimos el objeto Graphics a Graphics2D para acceder a funciones avanzadas de renderizado
+        Graphics2D g2d = (Graphics2D) g.create();
+        
+        // Habilitar Antialiasing para que la transición de colores se vea fluida y limpia
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        // Definir los colores usando tus códigos Hexadecimales
+        Color colorInicio = Color.decode("#1B22A6"); // Rosa arriba
+        Color colorFin = Color.decode("#FFFCDE");    // Azul abajo
+        
+        // Crear el degradado vertical: (0, 0) es la esquina superior, (0, getHeight()) es el límite inferior
+        GradientPaint degradadoVertical = new GradientPaint(
+                0, 0, colorInicio, 
+                0, getHeight(), colorFin
+        );
+        
+        // Aplicar el lienzo de pintura y rellenar el rectángulo de este panel
+        g2d.setPaint(degradadoVertical);
+        g2d.fillRect(0, 0, getWidth(), getHeight());
+        
+        g2d.dispose(); // Liberar los recursos gráficos inmediatamente
+        super.paintComponent(g);
+    }
     @SuppressWarnings("unchecked")
  
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -79,10 +110,11 @@ public class AperturaCaja extends javax.swing.JPanel {
 
         jScrollPane1.setViewportView(jTextPane1);
 
-        setMinimumSize(new java.awt.Dimension(500, 500));
-        setPreferredSize(new java.awt.Dimension(500, 500));
+        setMinimumSize(new java.awt.Dimension(860, 640));
+        setPreferredSize(new java.awt.Dimension(860, 640));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Cajero");
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -93,6 +125,7 @@ public class AperturaCaja extends javax.swing.JPanel {
         jTextField1.addActionListener(this::jTextField1ActionPerformed);
         add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 540, 240, -1));
 
+        jButton1.setBackground(new java.awt.Color(222, 237, 255));
         jButton1.setText("Atrás");
         jButton1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
