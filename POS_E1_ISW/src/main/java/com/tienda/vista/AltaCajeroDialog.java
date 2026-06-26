@@ -57,6 +57,10 @@ public class AltaCajeroDialog extends javax.swing.JDialog {
         // Placeholders
         jTextField1.putClientProperty("JTextField.placeholderText", "Ingrese el nombre del nuevo cajero");
         jPasswordField1.putClientProperty("JTextField.placeholderText", "Ingrese contraseña de nuevo cajero");
+
+        // nombre_usuario es VARCHAR(50) en la BD
+        com.tienda.util.Sanitizador.limitarTexto(jTextField1, "^[a-zA-Z0-9_.\\-]*$", 50);
+        com.tienda.util.Sanitizador.limitarLongitud(jPasswordField1, 100);
         
         jLabel2.putClientProperty("FlatLaf.style", "font: 26 'DearSans-Book'");
         

@@ -12,8 +12,11 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import com.tienda.dao.ProductoDAO;
 import java.util.List;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GradientPaint;
@@ -39,7 +42,7 @@ public class InventarioPanel extends javax.swing.JPanel {
         //Crea la opción de cerrar sesión
         JMenuItem itemCerrarSesion = new JMenuItem("Cerrar sesión");
         // Icono
-        // itemCerrarSesion.setIcon(Icono); //Por si quiero importar un icono, pero 
+        // itemCerrarSesion.setIcon(Icono); //Por si quiero importar un icono, pero
         // no lo dice Diseño
         cargarProductosEnTabla();
         // Agregar la acción al botón de cerrar sesión
@@ -53,6 +56,14 @@ public class InventarioPanel extends javax.swing.JPanel {
                 framePrincipal.cambiarPanel(LoginPanel);
             }
         });
+
+        // RF-12: reporte de ventas diario, solo accesible para el Administrador
+        JMenuItem itemReporte = new JMenuItem("Reporte de ventas diario");
+        itemReporte.addActionListener(e -> {
+            java.awt.Frame parentFrame = (java.awt.Frame) javax.swing.SwingUtilities.getWindowAncestor(this);
+            new ReporteVentasDialog(parentFrame, true).setVisible(true);
+        });
+        menuUsuario.add(itemReporte);
         // Agregar el evento de clic al ícono de administrador
         jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
@@ -93,8 +104,70 @@ public class InventarioPanel extends javax.swing.JPanel {
         jButton3.putClientProperty("JButton.buttonType", "roundRect");
         
         jLabel2.setIconTextGap(20);
+
+        configurarColumnaAcciones();
+        configurarResaltadoStockCritico();
     }
-    
+
+    // Columna "Acciones": botones Modificar/Borrar resueltos contra el id_producto oculto (columna 7)
+    private void configurarColumnaAcciones() {
+        AccionesProductoColumn columnaAcciones = new AccionesProductoColumn(jTable1, this::abrirEdicionProducto, this::confirmarYBorrarProducto);
+        jTable1.getColumnModel().getColumn(4).setCellRenderer(columnaAcciones);
+        jTable1.getColumnModel().getColumn(4).setCellEditor(columnaAcciones);
+    }
+
+    private void abrirEdicionProducto(int filaModelo) {
+        int idProducto = ((Number) jTable1.getModel().getValueAt(filaModelo, 7)).intValue();
+        java.awt.Frame parentFrame = (java.awt.Frame) javax.swing.SwingUtilities.getWindowAncestor(this);
+
+        NuevoProductoDialog dialog = new NuevoProductoDialog(parentFrame, true, this, idProducto);
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+    }
+
+    private void confirmarYBorrarProducto(int filaModelo) {
+        int idProducto = ((Number) jTable1.getModel().getValueAt(filaModelo, 7)).intValue();
+        String nombreProducto = (String) jTable1.getModel().getValueAt(filaModelo, 0);
+
+        boolean confirmado = ConfirmacionDialog.confirmarAccionDestructiva(this, "Confirmación",
+                "¿Desea eliminar el producto \"" + nombreProducto + "\" del catálogo?", "Eliminar");
+
+        if (!confirmado) {
+            return;
+        }
+
+        ProductoDAO productoDAO = new ProductoDAO();
+        if (productoDAO.desactivarProducto(idProducto)) {
+            JOptionPane.showMessageDialog(this, "Producto eliminado del catálogo.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            cargarProductosEnTabla();
+        } else {
+            JOptionPane.showMessageDialog(this, "No se pudo eliminar el producto.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // RIU-02: resalta en naranja (#FFA500) las filas con stock_actual <= stock_minimo
+    private void configurarResaltadoStockCritico() {
+        DefaultTableCellRenderer rendererStock = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                int filaModelo = table.convertRowIndexToModel(row);
+                double stockActual = ((Number) table.getModel().getValueAt(filaModelo, 5)).doubleValue();
+                double stockMinimo = ((Number) table.getModel().getValueAt(filaModelo, 6)).doubleValue();
+                if (!isSelected) {
+                    c.setBackground(stockActual <= stockMinimo ? Color.decode("#FFA500") : Color.WHITE);
+                }
+                return c;
+            }
+        };
+
+        for (int columna = 0; columna < jTable1.getColumnModel().getColumnCount(); columna++) {
+            if (columna != 4) {
+                jTable1.getColumnModel().getColumn(columna).setCellRenderer(rendererStock);
+            }
+        }
+    }
+
     public void cargarProductosEnTabla() {
         // Obtencion el modelo por defecto del jTable
         DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();

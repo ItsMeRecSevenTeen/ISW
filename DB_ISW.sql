@@ -12,7 +12,8 @@ CREATE TABLE `producto` (
   `contenido_neto` VARCHAR(50) COMMENT 'Peso, volumen o cantidad contenida en el empaque',
   `marca` VARCHAR(50) COMMENT 'Marca comercial fabricante del producto',
   `es_refrigerable` BOOLEAN COMMENT 'Indicador de si requiere almacenamiento en frío',
-  `fecha_caducidad` DATE COMMENT 'Fecha máxima para el consumo o venta del producto'
+  `fecha_caducidad` DATE COMMENT 'Fecha máxima para el consumo o venta del producto',
+  `activo` TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'Bandera lógica para mostrar/ocultar el producto del catálogo sin borrar su historial de ventas'
 );
 
 CREATE TABLE `usuario` (
@@ -72,7 +73,7 @@ CREATE TABLE `configuracion` (
 
 CREATE TABLE `reporte` (
   `id_reporte` INT PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador de la partida en el ticket',
-  `fecha_generación` DATETIME COMMENT 'Fecha en el que se generó el reporte',
+  `fecha_generacion` DATETIME COMMENT 'Fecha en el que se generó el reporte',
   `total_ventas_brutas` DECIMAL(10,2) COMMENT 'Cuántas ventas se hicieron en total',
   `ganancia_neta` DECIMAL(10,2) COMMENT 'Cuánto se ganó en total',
   `tipo_reporte` VARCHAR(20) COMMENT 'Qué tipo de reporte se está expidiendo'

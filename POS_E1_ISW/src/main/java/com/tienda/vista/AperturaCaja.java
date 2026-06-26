@@ -184,7 +184,8 @@ public class AperturaCaja extends javax.swing.JPanel {
             System.out.println("DEBUG - ID del cajero enviado: " + idLogueado); //Depuración
             // Instanciado del DAO y se le pasa ambos datos
             TurnoCajaDAO turnoDAO = new TurnoCajaDAO();
-            turnoDAO.registrarApertura(monto, idLogueado);
+            int idTurno = turnoDAO.registrarApertura(monto, idLogueado);
+            com.tienda.util.Sesion.getInstancia().setIdTurno(idTurno);
 
             // Limpiar campo
             jTextField1.setText("");

@@ -53,6 +53,10 @@ public class AdminLoginPanel extends javax.swing.JPanel {
         // Placeholders
         jTextField1.putClientProperty("JTextField.placeholderText", "Ingrese su usuario");
         jPasswordField1.putClientProperty("JTextField.placeholderText", "Ingrese su contraseña");
+
+        // nombre_usuario es VARCHAR(50) en la BD
+        com.tienda.util.Sanitizador.limitarTexto(jTextField1, "^[a-zA-Z0-9_.\\-]*$", 50);
+        com.tienda.util.Sanitizador.limitarLongitud(jPasswordField1, 100);
     }
     @Override
     protected void paintComponent(Graphics g) {

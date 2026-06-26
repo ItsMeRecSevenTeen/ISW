@@ -25,11 +25,18 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
      */
     // Conexión continua con el panel de inventario
     private InventarioPanel panelInventario;
-    
+    // null = alta de producto nuevo; no null = edición del producto con ese id
+    private Integer idProductoEditar;
+
     public NuevoProductoDialog(java.awt.Frame parent, boolean modal, InventarioPanel panelInventario) {
+        this(parent, modal, panelInventario, null);
+    }
+
+    public NuevoProductoDialog(java.awt.Frame parent, boolean modal, InventarioPanel panelInventario, Integer idProducto) {
         super(parent, modal);
         initComponents();
         this.panelInventario = panelInventario;
+        this.idProductoEditar = idProducto;
 
         // --- SECCIÓN DE HARDENING CON LÍMITES DE BASE DE DATOS ---
     
@@ -68,7 +75,37 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
         agregarTipo.putClientProperty("FlatLaf.style", "font: 15 'DearSans-Book'");
         agregarTipo.setText("<html><body style='margin-top: 2px;'>Agregar tipo</body></html>");
         setLocationRelativeTo(parent);
-         String Tamano=tamano.getText();    
+
+        if (idProductoEditar != null) {
+            cargarProductoParaEdicion(idProductoEditar);
+        }
+    }
+
+    private void cargarProductoParaEdicion(int idProducto) {
+        com.tienda.dao.ProductoDAO prodDAO = new com.tienda.dao.ProductoDAO();
+        com.tienda.modelo.Producto prod = prodDAO.obtenerProductoPorId(idProducto);
+        if (prod == null) {
+            JOptionPane.showMessageDialog(this, "No se pudo cargar el producto a editar.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        setTitle("Editar producto");
+        nombre.setText(prod.getNombre());
+        marca.setText(prod.getMarca());
+        tamano.setText(prod.getContenidoNeto());
+        precioCompra.setText(String.format("%.2f", prod.getPrecioCompra()));
+        precio.setText(String.format("%.2f", prod.getPrecioVenta()));
+        stock.setText(String.format("%.2f", prod.getStockActual()));
+        stockMinimo1.setText(String.format("%.2f", prod.getStockMinimo()));
+        CodigoBarras.setText(prod.getCodigoBarras());
+        SKUgen.setText(prod.getSku());
+
+        // tipo_producto no se persiste en la BD; se fija un valor válido para no bloquear el guardado
+        if (tipoProducto.getItemCount() > 1) {
+            tipoProducto.setSelectedIndex(1);
+        }
+
+        aceptar.setText("<html><body style='margin-top: 2px;'>Guardar cambios</body></html>");
     }
     private void limpiarFormulario() {
     nombre.setText("");
@@ -264,9 +301,9 @@ private void sanitizarCampo(javax.swing.JTextField campo, String regex, int maxL
             return;
         }
         try {
-            // 1. Convertimos los textos a números reales
-            int cantStockMinimo = Integer.parseInt(stockMinimo1.getText().trim());
-            int cantStockActual = Integer.parseInt(stock.getText().trim());
+            // 1. Convertimos los textos a números reales (decimales: la BD usa DECIMAL(10,2) para soportar granel)
+            double cantStockMinimo = Double.parseDouble(stockMinimo1.getText().trim());
+            double cantStockActual = Double.parseDouble(stock.getText().trim());
 
             // 2. Hacemos tu validación de negocio
             if (cantStockMinimo > cantStockActual) {
@@ -276,7 +313,7 @@ private void sanitizarCampo(javax.swing.JTextField campo, String regex, int maxL
             }
         } catch (NumberFormatException e) {
             // Si el usuario metió letras, letras chinas, símbolos o dejó vacío algo numérico
-            javax.swing.JOptionPane.showMessageDialog(this, "Los campos de Stock y Stock Mínimo deben ser números enteros válidos", "Error de Formato", javax.swing.JOptionPane.ERROR_MESSAGE);
+            javax.swing.JOptionPane.showMessageDialog(this, "Los campos de Stock y Stock Mínimo deben ser números válidos", "Error de Formato", javax.swing.JOptionPane.ERROR_MESSAGE);
             return;
         }
         String sku = SKUgen.getText().trim();
@@ -299,21 +336,28 @@ private void sanitizarCampo(javax.swing.JTextField campo, String regex, int maxL
 
             // --- GUARDADO EN BASE DE DATOS ---
             com.tienda.dao.ProductoDAO prodDAO = new com.tienda.dao.ProductoDAO();
-            boolean guardadoExitoso = prodDAO.guardarProducto(sku, nombreProd, dPrecioCompra, dPrecioVenta, dStockActual, dStockMinimo, codBarras, contenidoNeto, marcaProd);
+            boolean esEdicion = idProductoEditar != null;
+            boolean guardadoExitoso = esEdicion
+                    ? prodDAO.actualizarProducto(idProductoEditar, sku, nombreProd, dPrecioCompra, dPrecioVenta, dStockActual, dStockMinimo, codBarras, contenidoNeto, marcaProd)
+                    : prodDAO.guardarProducto(sku, nombreProd, dPrecioCompra, dPrecioVenta, dStockActual, dStockMinimo, codBarras, contenidoNeto, marcaProd);
 
             if (guardadoExitoso) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Producto registrado y guardado correctamente");
+                javax.swing.JOptionPane.showMessageDialog(this, esEdicion ? "Producto actualizado correctamente" : "Producto registrado y guardado correctamente");
 
                 // Actualizar la tabla del inventario
                 if (this.panelInventario != null) {
                     this.panelInventario.cargarProductosEnTabla();
                 }
 
-                // Limpieza de campos para el siguiente producto
-                limpiarFormulario();
+                if (esEdicion) {
+                    dispose();
+                } else {
+                    // Limpieza de campos para el siguiente producto
+                    limpiarFormulario();
+                }
 
             } else {
-                javax.swing.JOptionPane.showMessageDialog(this, "No se pudo registrar el producto.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                javax.swing.JOptionPane.showMessageDialog(this, esEdicion ? "No se pudo actualizar el producto." : "No se pudo registrar el producto.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (NumberFormatException ex) {
