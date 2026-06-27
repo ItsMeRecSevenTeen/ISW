@@ -29,6 +29,12 @@ import java.awt.RenderingHints;
  */
 public class InventarioPanel extends javax.swing.JPanel {
 
+    // id_producto de cada fila, en el mismo orden que las filas de jTable1.
+    // DefaultTableModel.addRow() normaliza cada fila a exactamente getColumnCount()
+    // elementos (rellena con null si faltan, TRUNCA si sobran), así que no se puede
+    // guardar el id en una columna "oculta" más allá de las 7 declaradas.
+    private final java.util.List<Integer> idsProductosEnTabla = new java.util.ArrayList<>();
+
     /**
      * Creates new form InventarioPanel
      */
@@ -109,7 +115,7 @@ public class InventarioPanel extends javax.swing.JPanel {
         configurarResaltadoStockCritico();
     }
 
-    // Columna "Acciones": botones Modificar/Borrar resueltos contra el id_producto oculto (columna 7)
+    // Columna "Acciones": botones Modificar/Borrar resueltos contra idsProductosEnTabla
     private void configurarColumnaAcciones() {
         AccionesProductoColumn columnaAcciones = new AccionesProductoColumn(jTable1, this::abrirEdicionProducto, this::confirmarYBorrarProducto);
         jTable1.getColumnModel().getColumn(4).setCellRenderer(columnaAcciones);
@@ -117,7 +123,7 @@ public class InventarioPanel extends javax.swing.JPanel {
     }
 
     private void abrirEdicionProducto(int filaModelo) {
-        int idProducto = ((Number) jTable1.getModel().getValueAt(filaModelo, 7)).intValue();
+        int idProducto = idsProductosEnTabla.get(filaModelo);
         java.awt.Frame parentFrame = (java.awt.Frame) javax.swing.SwingUtilities.getWindowAncestor(this);
 
         NuevoProductoDialog dialog = new NuevoProductoDialog(parentFrame, true, this, idProducto);
@@ -126,7 +132,7 @@ public class InventarioPanel extends javax.swing.JPanel {
     }
 
     private void confirmarYBorrarProducto(int filaModelo) {
-        int idProducto = ((Number) jTable1.getModel().getValueAt(filaModelo, 7)).intValue();
+        int idProducto = idsProductosEnTabla.get(filaModelo);
         String nombreProducto = (String) jTable1.getModel().getValueAt(filaModelo, 0);
 
         boolean confirmado = ConfirmacionDialog.confirmarAccionDestructiva(this, "Confirmación",
@@ -174,6 +180,7 @@ public class InventarioPanel extends javax.swing.JPanel {
 
         // Limpieza de  la tabla para que no se dupliquen los registros al recargar
         modelo.setRowCount(0);
+        idsProductosEnTabla.clear();
 
         // Instanciar el DAO y traer la lista de objetos
         ProductoDAO productoDAO = new ProductoDAO();
@@ -181,10 +188,10 @@ public class InventarioPanel extends javax.swing.JPanel {
 
         // Recorrer la lista e ir agregando fila por fila al modelo de la tabla
         for (Object[] fila : productos) {
-            // Añade la fila a la tabla Aunque se pase el arreglo con el ID en la posición 7,
-            // si la tabla en NetBeans solo tiene 7 columnas definidas visualmente, el ID se mantendrá 
-            // de forma "oculta" en la memoria del modelo
             modelo.addRow(fila);
+            // El id_producto (fila[7]) se guarda aparte: addRow() trunca las filas a las
+            // 7 columnas declaradas, así que ese 8vo elemento nunca sobrevive en el modelo.
+            idsProductosEnTabla.add((Integer) fila[7]);
         }
     }
     @Override
@@ -272,7 +279,7 @@ public class InventarioPanel extends javax.swing.JPanel {
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false
+                false, false, false, false, true, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
