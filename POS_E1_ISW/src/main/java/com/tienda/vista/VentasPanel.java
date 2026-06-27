@@ -214,8 +214,12 @@ public class VentasPanel extends javax.swing.JPanel {
         panelTicket.add(crearRenglonTicket("Total:", totalConIva, Font.BOLD));
 
         JScrollPane scrollTicket = new JScrollPane(panelTicket);
-        scrollTicket.setPreferredSize(new Dimension(300, 160));
-        scrollTicket.setMaximumSize(new Dimension(300, 160));
+        // Más alto y ancho para que el ticket no se vea apretado; sin scroll horizontal
+        // (los renglones ya caben a lo ancho) y el vertical solo aparece si hace falta.
+        scrollTicket.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollTicket.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollTicket.setPreferredSize(new Dimension(380, 280));
+        scrollTicket.setMaximumSize(new Dimension(380, 280));
         scrollTicket.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JPanel panelAccionPago = new JPanel();

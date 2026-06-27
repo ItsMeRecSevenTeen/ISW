@@ -91,10 +91,23 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
         getContentPane().add(esGranelCheck, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 310, 225, -1));
         getContentPane().add(precioPorKgField, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 337, 150, -1));
 
+        // Reemplaza los tipos hardcodeados del .form por los persistidos en la BD
+        cargarTiposProducto();
+
         setLocationRelativeTo(parent);
 
         if (idProductoEditar != null) {
             cargarProductoParaEdicion(idProductoEditar);
+        }
+    }
+
+    // Llena el combo con el placeholder + los tipos guardados en la tabla configuracion,
+    // de modo que los tipos agregados en sesiones anteriores no se pierdan.
+    private void cargarTiposProducto() {
+        tipoProducto.removeAllItems();
+        tipoProducto.addItem("Seleccione un tipo");
+        for (String tipo : new ConfiguracionDAO().getTiposProducto()) {
+            tipoProducto.addItem(tipo);
         }
     }
 
@@ -267,8 +280,41 @@ private void sanitizarCampo(javax.swing.JTextField campo, String regex, int maxL
     }// </editor-fold>//GEN-END:initComponents
 
     private void agregarTipoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agregarTipoActionPerformed
-         String tipoProd=JOptionPane.showInputDialog("ingresa un nuevo tipo de producto: ");
-        tipoProducto.addItem(tipoProd);
+        String entrada = JOptionPane.showInputDialog(this, "Ingresa un nuevo tipo de producto:");
+
+        // Cancelar o cerrar (botón X / Esc) devuelve null: no se agrega nada.
+        if (entrada == null) {
+            return;
+        }
+
+        String tipoProd = entrada.trim();
+        if (tipoProd.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "El tipo de producto no puede estar vacío.", "Dato inválido", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Sanitización: solo letras, números y espacios (sin '|' que es el delimitador
+        // de la lista persistida ni otros símbolos que corrompan los datos). Máx. 30.
+        if (!tipoProd.matches("^[a-zA-Z0-9áéíóúñÁÉÍÓÚÑ ]{1,30}$")) {
+            JOptionPane.showMessageDialog(this, "El tipo solo puede contener letras, números y espacios (máximo 30 caracteres).", "Dato inválido", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Evita duplicados (incluye el placeholder y los ya existentes), sin distinguir mayúsculas.
+        for (int i = 0; i < tipoProducto.getItemCount(); i++) {
+            if (tipoProducto.getItemAt(i).equalsIgnoreCase(tipoProd)) {
+                JOptionPane.showMessageDialog(this, "Ese tipo de producto ya existe.", "Duplicado", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+        }
+
+        // Persiste primero; solo si se guarda en la BD se agrega al combo.
+        if (new ConfiguracionDAO().agregarTipoProducto(tipoProd)) {
+            tipoProducto.addItem(tipoProd);
+            tipoProducto.setSelectedItem(tipoProd);
+        } else {
+            JOptionPane.showMessageDialog(this, "No se pudo guardar el tipo de producto.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_agregarTipoActionPerformed
 
     private void precioCompraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_precioCompraActionPerformed

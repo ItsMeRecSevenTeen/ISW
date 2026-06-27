@@ -73,6 +73,7 @@ public class AltaCajeroDialog extends javax.swing.JDialog {
         //jButton2.putClientProperty("JButton.buttonType", "roundRect");
         jButton2.putClientProperty("FlatLaf.style", "font: 20 'DearSans-Book'");
         jButton2.setText("<html><body style='margin-top: 2px;'>Cancelar</body></html>");
+        com.tienda.util.TablaUtil.fijarColumnas(jTable1);
         setLocationRelativeTo(parent); // Centrar la ventana modal en el centro del frame
     }
     

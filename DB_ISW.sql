@@ -68,7 +68,7 @@ CREATE TABLE `bitacora_logs` (
 
 CREATE TABLE `configuracion` (
   `clave` VARCHAR(50) PRIMARY KEY COMMENT 'Identificador nominal de la variable de sistema',
-  `valor` VARCHAR(255) NOT NULL COMMENT 'Valor asignado a la configuración paramétrica'
+  `valor` VARCHAR(500) NOT NULL COMMENT 'Valor asignado a la configuración paramétrica'
 );
 
 CREATE TABLE `reporte` (

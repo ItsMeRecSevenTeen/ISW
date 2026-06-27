@@ -113,6 +113,7 @@ public class InventarioPanel extends javax.swing.JPanel {
 
         configurarColumnaAcciones();
         configurarResaltadoStockCritico();
+        com.tienda.util.TablaUtil.fijarColumnas(jTable1);
     }
 
     // Columna "Acciones": botones Modificar/Borrar resueltos contra idsProductosEnTabla
