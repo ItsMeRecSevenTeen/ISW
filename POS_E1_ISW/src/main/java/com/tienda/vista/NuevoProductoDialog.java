@@ -88,8 +88,8 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
                 precioPorKgField.setText("");
             }
         });
-        getContentPane().add(esGranelCheck, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 405, 350, -1));
-        getContentPane().add(precioPorKgField, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 432, 150, -1));
+        getContentPane().add(esGranelCheck, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 310, 225, -1));
+        getContentPane().add(precioPorKgField, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 337, 150, -1));
 
         setLocationRelativeTo(parent);
 
@@ -207,7 +207,7 @@ private void sanitizarCampo(javax.swing.JTextField campo, String regex, int maxL
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setBounds(new java.awt.Rectangle(0, 30, 505, 500));
         setName("nuevoProducto"); // NOI18N
-        setPreferredSize(new java.awt.Dimension(400, 450));
+        setPreferredSize(new java.awt.Dimension(400, 500));
         setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -242,10 +242,10 @@ private void sanitizarCampo(javax.swing.JTextField campo, String regex, int maxL
 
         jLabel3.setFont(new java.awt.Font("Helvetica", 1, 18)); // NOI18N
         jLabel3.setText("Código de barras");
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 330, 170, -1));
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 370, 170, -1));
 
         aceptar.addActionListener(this::aceptarActionPerformed);
-        getContentPane().add(aceptar, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 370, -1, 30));
+        getContentPane().add(aceptar, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 420, -1, 30));
 
         generarSku.setText("Generar SKU");
         generarSku.addActionListener(this::generarSkuActionPerformed);
@@ -261,7 +261,7 @@ private void sanitizarCampo(javax.swing.JTextField campo, String regex, int maxL
         getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 250, 150, -1));
 
         CodigoBarras.addActionListener(this::CodigoBarrasActionPerformed);
-        getContentPane().add(CodigoBarras, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 330, 140, -1));
+        getContentPane().add(CodigoBarras, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 370, 140, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
