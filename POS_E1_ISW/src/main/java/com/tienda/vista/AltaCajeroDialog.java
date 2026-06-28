@@ -161,7 +161,6 @@ public class AltaCajeroDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(505, 500));
         setName("Dar de alta nuevo cajero"); // NOI18N
-        setPreferredSize(new java.awt.Dimension(505, 500));
         setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -176,10 +175,14 @@ public class AltaCajeroDialog extends javax.swing.JDialog {
         jLabel3.setText("Usuarios existentes");
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 170, -1, -1));
 
+        jButton1.setBackground(new java.awt.Color(71, 210, 165));
+        jButton1.setForeground(new java.awt.Color(255, 255, 255));
         jButton1.setText("Guardar");
         jButton1.addActionListener(this::jButton1ActionPerformed);
         getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 60, -1, -1));
 
+        jButton2.setBackground(new java.awt.Color(255, 38, 105));
+        jButton2.setForeground(new java.awt.Color(255, 255, 255));
         jButton2.setText("Cancelar");
         jButton2.addActionListener(this::jButton2ActionPerformed);
         getContentPane().add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 120, -1, -1));

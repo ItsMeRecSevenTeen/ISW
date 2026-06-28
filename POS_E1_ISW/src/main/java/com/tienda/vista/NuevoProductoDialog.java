@@ -220,14 +220,17 @@ private void sanitizarCampo(javax.swing.JTextField campo, String regex, int maxL
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setBounds(new java.awt.Rectangle(0, 30, 505, 500));
         setName("nuevoProducto"); // NOI18N
-        setPreferredSize(new java.awt.Dimension(400, 500));
         setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        tipoProducto.setBackground(new java.awt.Color(250, 247, 251));
+        tipoProducto.setForeground(new java.awt.Color(165, 104, 188));
         tipoProducto.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione un tipo", "Refrescos", "Frituras", "Lacteos", "Dulces" }));
         tipoProducto.addActionListener(this::tipoProductoActionPerformed);
         getContentPane().add(tipoProducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 150, -1));
 
+        agregarTipo.setBackground(new java.awt.Color(250, 247, 251));
+        agregarTipo.setForeground(new java.awt.Color(165, 104, 188));
         agregarTipo.setText("Agregar tipo +");
         agregarTipo.addActionListener(this::agregarTipoActionPerformed);
         getContentPane().add(agregarTipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 50, -1, -1));
@@ -257,9 +260,12 @@ private void sanitizarCampo(javax.swing.JTextField campo, String regex, int maxL
         jLabel3.setText("Código de barras");
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 370, 170, -1));
 
+        aceptar.setBackground(new java.awt.Color(71, 210, 165));
         aceptar.addActionListener(this::aceptarActionPerformed);
         getContentPane().add(aceptar, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 420, -1, 30));
 
+        generarSku.setBackground(new java.awt.Color(250, 247, 251));
+        generarSku.setForeground(new java.awt.Color(165, 104, 188));
         generarSku.setText("Generar SKU");
         generarSku.addActionListener(this::generarSkuActionPerformed);
         getContentPane().add(generarSku, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 280, -1, -1));

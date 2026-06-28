@@ -231,9 +231,11 @@ public class VentasPanel extends javax.swing.JPanel {
 
         JButton btnEfectivo = new JButton("Efectivo 💵");
         btnEfectivo.setFont(new Font("Arial", Font.BOLD, 12));
+        btnEfectivo.setForeground(new Color(165,104,188));
 
         JButton btnTarjeta = new JButton("Tarjeta 💳");
         btnTarjeta.setFont(new Font("Arial", Font.BOLD, 12));
+        btnTarjeta.setForeground(new Color(165,104,188));
         btnTarjeta.addActionListener(e -> finalizarTransaccion("Tarjeta", ivaPorcentaje, ivaMonto, totalConIva, totalConIva, 0));
 
         // Lógica de transición de cobro por Efectivo
@@ -250,6 +252,8 @@ public class VentasPanel extends javax.swing.JPanel {
 
             JButton btnCalcularCambio = new JButton("Aceptar");
             btnCalcularCambio.setFont(new Font("Arial", Font.BOLD, 12));
+            btnCalcularCambio.setBackground(new Color(71,210,165));
+            btnCalcularCambio.setForeground(new Color(255,255,255));
 
             panelIngresoEfectivo.add(new JLabel("Paga con: $"), BorderLayout.WEST);
             panelIngresoEfectivo.add(txtEfectivo, BorderLayout.CENTER);
@@ -279,6 +283,8 @@ public class VentasPanel extends javax.swing.JPanel {
                     JButton btnFinalizarEfectivo = new JButton("Finalizar Transacción ✓");
                     btnFinalizarEfectivo.setFont(new Font("Arial", Font.BOLD, 13));
                     btnFinalizarEfectivo.setMaximumSize(new Dimension(300, 40));
+                    btnFinalizarEfectivo.setForeground(new Color(255,255,255));
+                    btnFinalizarEfectivo.setBackground(new Color(71,210,165));
                     btnFinalizarEfectivo.setAlignmentX(Component.CENTER_ALIGNMENT);
                     btnFinalizarEfectivo.addActionListener(ev -> finalizarTransaccion("Efectivo", ivaPorcentaje, ivaMonto, totalConIva, efectivo, cambio));
 
@@ -545,8 +551,8 @@ private void agregarOIncrementarProducto(String nombre, double precio, String co
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         
         // Definir los colores usando tus códigos Hexadecimales
-        Color colorInicio = Color.decode("#232AA8"); // Rosa arriba
-        Color colorFin = Color.decode("#9EB3FF");    // Azul abajo
+        Color colorInicio = Color.decode("#F0F2F4"); // Rosa arriba
+        Color colorFin = Color.decode("#F0F2F4");    // Azul abajo
         
         // Crear el degradado vertical: (0, 0) es la esquina superior, (0, getHeight()) es el límite inferior
         GradientPaint degradadoVertical = new GradientPaint(
@@ -589,7 +595,7 @@ private void agregarOIncrementarProducto(String nombre, double precio, String co
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        BotonTotal.setBackground(new java.awt.Color(255, 191, 236));
+        BotonTotal.setBackground(new java.awt.Color(71, 210, 165));
         BotonTotal.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         BotonTotal.addActionListener(this::BotonTotalActionPerformed);
         jPanel1.add(BotonTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 578, 250, 70));

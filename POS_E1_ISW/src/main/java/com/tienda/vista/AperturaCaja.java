@@ -26,7 +26,7 @@ public class AperturaCaja extends javax.swing.JPanel {
         
         jButton1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/gback.svg", 24, 24));
         jLabel1.putClientProperty("FlatLaf.style", "font: 56 'Arial Rounded MT Bold'");
-        jLabel1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/userblnco.svg", (float) 4.0));
+        jLabel1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/user1.svg", (float) 4.0));
         // Centrar el contenido (icono + texto) horizontalmente
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         // Mover el texto abajo del icono
@@ -77,8 +77,8 @@ public class AperturaCaja extends javax.swing.JPanel {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         
         // Definir los colores usando tus códigos Hexadecimales
-        Color colorInicio = Color.decode("#1B22A6"); // Rosa arriba
-        Color colorFin = Color.decode("#FFFCDE");    // Azul abajo
+        Color colorInicio = Color.decode("#F0F2F4"); // Rosa arriba
+        Color colorFin = Color.decode("#F0F2F4");    // Azul abajo
         
         // Crear el degradado vertical: (0, 0) es la esquina superior, (0, getHeight()) es el límite inferior
         GradientPaint degradadoVertical = new GradientPaint(
@@ -114,7 +114,7 @@ public class AperturaCaja extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(860, 640));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setForeground(new java.awt.Color(165, 104, 188));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Cajero");
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -125,7 +125,8 @@ public class AperturaCaja extends javax.swing.JPanel {
         jTextField1.addActionListener(this::jTextField1ActionPerformed);
         add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 540, 240, -1));
 
-        jButton1.setBackground(new java.awt.Color(222, 237, 255));
+        jButton1.setBackground(new java.awt.Color(250, 247, 251));
+        jButton1.setForeground(new java.awt.Color(165, 104, 188));
         jButton1.setText("Atrás");
         jButton1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);

@@ -181,8 +181,8 @@ public class CierreCaja extends javax.swing.JPanel {
         Graphics2D g2d = (Graphics2D) g.create();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        Color colorInicio = Color.decode("#232AA8");
-        Color colorFin = Color.decode("#9EB3FF");
+        Color colorInicio = Color.decode("#F0F2F4");
+        Color colorFin = Color.decode("#F0F2F4");
 
         GradientPaint degradadoVertical = new GradientPaint(0, 0, colorInicio, 0, getHeight(), colorFin);
 

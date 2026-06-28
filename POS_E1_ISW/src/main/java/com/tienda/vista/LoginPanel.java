@@ -45,8 +45,8 @@ public class LoginPanel extends javax.swing.JPanel {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         
         // Definir los colores usando tus códigos Hexadecimales
-        Color colorInicio = Color.decode("#9EB3FF"); // Rosa arriba
-        Color colorFin = Color.decode("#232AA8");    // Azul abajo
+        Color colorInicio = Color.decode("#F0F2F4"); // Rosa arriba
+        Color colorFin = Color.decode("#F0F2F4");    // Azul abajo
         
         // Crear el degradado vertical: (0, 0) es la esquina superior, (0, getHeight()) es el límite inferior
         GradientPaint degradadoVertical = new GradientPaint(
@@ -80,18 +80,18 @@ public class LoginPanel extends javax.swing.JPanel {
 
         jLabel1.setBackground(new java.awt.Color(250, 247, 251));
         jLabel1.setFont(new java.awt.Font("New Peninim MT", 0, 48)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setForeground(new java.awt.Color(165, 104, 188));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("BIENVENIDO");
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setForeground(new java.awt.Color(165, 104, 188));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("IDENTIFICARSE");
 
-        jButton1.setBackground(new java.awt.Color(222, 237, 255));
+        jButton1.setBackground(new java.awt.Color(250, 247, 251));
         jButton1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(27, 34, 166));
+        jButton1.setForeground(new java.awt.Color(165, 104, 188));
         jButton1.setText("ADMINISTRADOR");
         jButton1.setToolTipText("");
         jButton1.setFocusable(false);
@@ -100,9 +100,9 @@ public class LoginPanel extends javax.swing.JPanel {
         jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jButton1.addActionListener(this::jButton1ActionPerformed);
 
-        jButton2.setBackground(new java.awt.Color(222, 237, 255));
+        jButton2.setBackground(new java.awt.Color(250, 247, 251));
         jButton2.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
-        jButton2.setForeground(new java.awt.Color(27, 34, 166));
+        jButton2.setForeground(new java.awt.Color(165, 104, 188));
         jButton2.setText("CAJERO");
         jButton2.setFocusable(false);
         jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);

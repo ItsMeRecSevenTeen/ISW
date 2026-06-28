@@ -83,7 +83,7 @@ public class InventarioPanel extends javax.swing.JPanel {
         menuUsuario.add(itemCerrarSesion);
         //Establece la fuente a tamaño 56
         jLabel2.putClientProperty("FlatLaf.style", "font: 56 'Arial Rounded MT Bold'");
-        jLabel1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/adminblanco.svg", (float) 2.0));
+        jLabel1.setIcon(new com.formdev.flatlaf.extras.FlatSVGIcon("icons/adminn.svg", (float) 2.0));
         // Centrar el contenido (icono + texto) horizontalmente
 //        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 //
@@ -204,8 +204,8 @@ public class InventarioPanel extends javax.swing.JPanel {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         
         // Definir los colores usando tus códigos Hexadecimales
-        Color colorInicio = Color.decode("#232AA8"); // Rosa arriba
-        Color colorFin = Color.decode("#DEEDFF");    // Azul abajo
+        Color colorInicio = Color.decode("#F0F2F4"); // Rosa arriba
+        Color colorFin = Color.decode("#F0F2F4");    // Azul abajo
         
         // Crear el degradado vertical: (0, 0) es la esquina superior, (0, getHeight()) es el límite inferior
         GradientPaint degradadoVertical = new GradientPaint(
@@ -248,7 +248,7 @@ public class InventarioPanel extends javax.swing.JPanel {
 
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setForeground(new java.awt.Color(165, 104, 188));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Administrador");
         jLabel2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -256,14 +256,20 @@ public class InventarioPanel extends javax.swing.JPanel {
         add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 60, 460, -1));
         add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 20, 130, 130));
 
+        jButton1.setBackground(new java.awt.Color(250, 247, 251));
+        jButton1.setForeground(new java.awt.Color(165, 104, 188));
         jButton1.setText("Dar de alta nuevo producto");
         jButton1.addActionListener(this::jButton1ActionPerformed);
         add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 190, 370, -1));
 
+        jButton2.setBackground(new java.awt.Color(250, 247, 251));
+        jButton2.setForeground(new java.awt.Color(165, 104, 188));
         jButton2.setText("Agregar cajero");
         jButton2.addActionListener(this::jButton2ActionPerformed);
         add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 190, 270, -1));
 
+        jButton3.setBackground(new java.awt.Color(250, 247, 251));
+        jButton3.setForeground(new java.awt.Color(165, 104, 188));
         jButton3.setText("Modificar IVA");
         jButton3.addActionListener(this::jButton3ActionPerformed);
         add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 190, 260, -1));
