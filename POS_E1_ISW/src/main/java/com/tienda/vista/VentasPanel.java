@@ -128,18 +128,32 @@ public class VentasPanel extends javax.swing.JPanel {
     }
 
     private void configurarTOTALPanelCheckout() {
-        TOTALPanel.setLayout(new BorderLayout());
-        TOTALPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+    TOTALPanel.setLayout(new BorderLayout());
+    TOTALPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        JButton btnRegresar = new JButton("← Volver a Ventas");
-        btnRegresar.setFont(new Font("Arial", Font.BOLD, 12));
-        btnRegresar.addActionListener(e -> navegador.show(contenedorTarjetas, "PANTALLA_VENTAS"));
+    JButton btnRegresar = new JButton("← Volver a Ventas");
+    btnRegresar.setFont(new Font("Arial", Font.BOLD, 12));
+    
+    // MODIFICADO: Acción del botón usando ConfirmacionDialog
+    btnRegresar.addActionListener(e -> {
+        boolean confirmado = ConfirmacionDialog.confirmarAccionDestructiva(
+                this, 
+                "Cancelar Venta", 
+                "¿Estás seguro de querer cancelar la compra actual y volver al inicio?", 
+                "Sí, Salir"
+        );
+        
+        // Si el usuario confirma, regresamos a la pantalla de ventas
+        if (confirmado) {
+            navegador.show(contenedorTarjetas, "PANTALLA_VENTAS");
+        }
+    });
 
-        JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        this.setOpaque(false);
-        panelSuperior.add(btnRegresar);
-        TOTALPanel.add(panelSuperior, BorderLayout.NORTH);
-    }
+    JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    this.setOpaque(false);
+    panelSuperior.add(btnRegresar);
+    TOTALPanel.add(panelSuperior, BorderLayout.NORTH);
+}
 
     private JPanel crearRenglonTicket(String etiqueta, double monto, int estiloFuente) {
         JPanel renglon = new JPanel(new BorderLayout());
