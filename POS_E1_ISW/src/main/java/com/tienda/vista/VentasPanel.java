@@ -17,6 +17,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GradientPaint;
 import java.awt.RenderingHints;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 
 
 public class VentasPanel extends javax.swing.JPanel {
@@ -31,6 +35,15 @@ public class VentasPanel extends javax.swing.JPanel {
     
     public VentasPanel() {
         initComponents();
+        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+    @Override
+    public void keyTyped(java.awt.event.KeyEvent e) {
+        // Si el texto ya tiene 10 caracteres, consume el evento para no escribir el nuevo carácter
+        if (jTextField1.getText().length() >= 10) {
+            e.consume(); // Detiene la entrada de texto
+        }
+    }
+});
         this.setOpaque(false);
         configurarEstructuraCardLayout(); // Inicializa la navegación antes que los paneles internos
         
@@ -556,6 +569,7 @@ private void agregarOIncrementarProducto(String nombre, double precio, String co
             });
         }
     }
+    
     @Override
     protected void paintComponent(Graphics g) {
         // Convertimos el objeto Graphics a Graphics2D para acceder a funciones avanzadas de renderizado
@@ -627,6 +641,7 @@ private void agregarOIncrementarProducto(String nombre, double precio, String co
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+
         // Captura lo que el escáner acaba de leer
     String skuEscaneado = jTextField1.getText().trim();
 
