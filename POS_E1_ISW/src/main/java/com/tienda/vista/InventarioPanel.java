@@ -114,6 +114,10 @@ public class InventarioPanel extends javax.swing.JPanel {
         configurarColumnaAcciones();
         configurarResaltadoStockCritico();
         com.tienda.util.TablaUtil.fijarColumnas(jTable1);
+        jButton5.setText("<html><body style='margin-top: 2px;'>Stock Bajo</body></html>");
+        jButton5.putClientProperty("FlatLaf.style", "font: 20 'DearSans-Book'");
+        jButton5.putClientProperty("JButton.buttonType", "roundRect");
+        jButton5.addActionListener(e -> ordenarPorStockBajo());
     }
 
     // Columna "Acciones": botones Modificar/Borrar resueltos contra idsProductosEnTabla
@@ -195,6 +199,61 @@ public class InventarioPanel extends javax.swing.JPanel {
             idsProductosEnTabla.add((Integer) fila[7]);
         }
     }
+    private void ordenarPorStockBajo() {
+        DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
+        int numeroFilas = modelo.getRowCount();
+
+        if (numeroFilas == 0) return;
+
+        // Estructuras temporales para dividir los registros
+        java.util.List<Object[]> criticosFilas = new java.util.ArrayList<>();
+        java.util.List<Integer> criticosIds = new java.util.ArrayList<>();
+
+        java.util.List<Object[]> normalesFilas = new java.util.ArrayList<>();
+        java.util.List<Integer> normalesIds = new java.util.ArrayList<>();
+
+        // 1. Clasificar filas evaluando las columnas 5 (Stock Actual) y 6 (Stock Mínimo)
+        for (int i = 0; i < numeroFilas; i++) {
+            double stockActual = ((Number) modelo.getValueAt(i, 5)).doubleValue();
+            double stockMinimo = ((Number) modelo.getValueAt(i, 6)).doubleValue();
+            int idActual = idsProductosEnTabla.get(i);
+
+            // Reconstruir el arreglo de objetos de la fila actual de la tabla
+            int numColumnas = modelo.getColumnCount();
+            Object[] datosFila = new Object[numColumnas];
+            for (int col = 0; col < numColumnas; col++) {
+                datosFila[col] = modelo.getValueAt(i, col);
+            }
+
+            if (stockActual <= stockMinimo) {
+                criticosFilas.add(datosFila);
+                criticosIds.add(idActual);
+            } else {
+                normalesFilas.add(datosFila);
+                normalesIds.add(idActual);
+            }
+        }
+
+        // 2. Limpiar las vistas y listas actuales
+        modelo.setRowCount(0);
+        idsProductosEnTabla.clear();
+
+        // 3. Volver a insertar primero los críticos (Stock Bajo)
+        for (int i = 0; i < criticosFilas.size(); i++) {
+            modelo.addRow(criticosFilas.get(i));
+            idsProductosEnTabla.add(criticosIds.get(i));
+        }
+
+        // 4. Insertar después los productos que están estables o normales
+        for (int i = 0; i < normalesFilas.size(); i++) {
+            modelo.addRow(normalesFilas.get(i));
+            idsProductosEnTabla.add(normalesIds.get(i));
+        }
+        
+        // Refrescar componentes gráficos
+        jTable1.revalidate();
+        jTable1.repaint();
+    }
     @Override
     protected void paintComponent(Graphics g) {
         // Convertimos el objeto Graphics a Graphics2D para acceder a funciones avanzadas de renderizado
@@ -239,6 +298,7 @@ public class InventarioPanel extends javax.swing.JPanel {
         jButton3 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        jButton5 = new javax.swing.JButton();
 
         menu1.setLabel("File");
         menuBar1.add(menu1);
@@ -311,6 +371,11 @@ public class InventarioPanel extends javax.swing.JPanel {
         }
 
         add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 270, 1090, -1));
+
+        jButton5.setBackground(new java.awt.Color(255, 165, 0));
+        jButton5.setText("Stock Bajo");
+        jButton5.addActionListener(this::jButton5ActionPerformed);
+        add(jButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(998, 190, 140, -1));
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -369,10 +434,15 @@ public class InventarioPanel extends javax.swing.JPanel {
         dialog.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+       
+    }//GEN-LAST:event_jButton5ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton5;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
