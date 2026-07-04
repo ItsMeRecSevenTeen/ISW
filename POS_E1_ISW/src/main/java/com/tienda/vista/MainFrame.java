@@ -59,16 +59,16 @@ public class MainFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         inventarioPanel1 = new com.tienda.vista.InventarioPanel();
-        ventasPanel1 = new com.tienda.vista.VentasPanel();
+        loginPanel1 = new com.tienda.vista.LoginPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        getContentPane().add(ventasPanel1, java.awt.BorderLayout.CENTER);
+        getContentPane().add(loginPanel1, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private com.tienda.vista.InventarioPanel inventarioPanel1;
-    private com.tienda.vista.VentasPanel ventasPanel1;
+    private com.tienda.vista.LoginPanel loginPanel1;
     // End of variables declaration//GEN-END:variables
 }
