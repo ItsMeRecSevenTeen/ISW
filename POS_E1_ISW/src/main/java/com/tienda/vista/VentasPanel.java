@@ -428,8 +428,8 @@ public class VentasPanel extends javax.swing.JPanel {
             boton.setFont(new Font("Arial", Font.BOLD, 10));
             boton.setMargin(new Insets(2, 2, 2, 2));
 
-            boton.addActionListener(e -> agregarOIncrementarProducto(nombreProducto, precioProducto, codigoBarrasProducto, idProductoCatalogo));
-
+           // boton.addActionListener(e -> agregarOIncrementarProducto(nombreProducto, precioProducto, codigoBarrasProducto, idProductoCatalogo));
+boton.addActionListener(e -> procesarSeleccionProductoCatalogo(prod));
             panelContenedor.add(boton);
         }
 
@@ -486,6 +486,118 @@ private void agregarOIncrementarProducto(String nombre, double precio, String co
     private void actualizarBotonTotal() {
         BotonTotal.setText("TOTAL: $" + String.format("%.2f", costoTotal));
     }
+    private void procesarSeleccionProductoCatalogo(Producto productoEncontrado) {
+    if (productoEncontrado == null) return;
+
+    // Variables finales que usará el flujo del ticket
+    final double[] cantidadAAgregar = {1.0};
+    final double[] precioAplicado = {productoEncontrado.getPrecioVenta()};
+
+    // Validar si el producto seleccionado es a granel
+    if (productoEncontrado.isEsGranel()) {
+        // Bandera para saber si el usuario dio clic en aceptar
+        final boolean[] aceptado = {false};
+
+        // Crear ventana modal emergente
+        JDialog dialogoGranel = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Venta a Granel", true);
+        dialogoGranel.setLayout(new BorderLayout(10, 10));
+        dialogoGranel.setSize(380, 240);
+        dialogoGranel.setLocationRelativeTo(this);
+
+        // Mensaje superior informativo
+        JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JLabel lblInstruccion = new JLabel("<html><center><b>" + productoEncontrado.getNombre() + "</b><br>Ingrese los gramos o seleccione una opción rápida:</center></html>");
+        lblInstruccion.setFont(new Font("Arial", Font.PLAIN, 13));
+        panelSuperior.add(lblInstruccion);
+        dialogoGranel.add(panelSuperior, BorderLayout.NORTH);
+
+        // Panel Central: Caja de texto + Botones de peso predefinido
+        JPanel panelCentral = new JPanel();
+        panelCentral.setLayout(new BoxLayout(panelCentral, BoxLayout.Y_AXIS));
+        panelCentral.setBorder(BorderFactory.createEmptyBorder(5, 20, 5, 20));
+
+        JTextField txtGramos = new JTextField();
+        txtGramos.setFont(new Font("Arial", Font.BOLD, 14));
+        txtGramos.putClientProperty("JTextField.placeholderText", "Ej. 500 para medio kilo");
+        
+        // Filtro para que el campo solo acepte números enteros
+        txtGramos.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyTyped(java.awt.event.KeyEvent e) {
+                char c = e.getKeyChar();
+                if (!Character.isDigit(c)) {
+                    e.consume();
+                }
+            }
+        });
+        panelCentral.add(txtGramos);
+        panelCentral.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        // Fila de botones rápidos (Asignamos los gramos correspondientes)
+        JPanel panelBotonesRapidos = new JPanel(new GridLayout(1, 3, 8, 8));
+        JButton btnUno = new JButton("1 Kg");
+        JButton btnUnoMedia = new JButton("1.5 Kg");
+        JButton btnDos = new JButton("2 Kg");
+
+        btnUno.addActionListener(e -> txtGramos.setText("1000"));
+        btnUnoMedia.addActionListener(e -> txtGramos.setText("1500"));
+        btnDos.addActionListener(e -> txtGramos.setText("2000"));
+
+        panelBotonesRapidos.add(btnUno);
+        panelBotonesRapidos.add(btnUnoMedia);
+        panelBotonesRapidos.add(btnDos);
+        panelCentral.add(panelBotonesRapidos);
+        
+        dialogoGranel.add(panelCentral, BorderLayout.CENTER);
+
+        // Panel Inferior: Botones de control de la ventana
+        JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+        JButton btnCancelar = new JButton("Cancelar");
+        JButton btnAceptar = new JButton("Aceptar");
+        
+        btnCancelar.addActionListener(e -> dialogoGranel.dispose());
+        
+        btnAceptar.addActionListener(e -> {
+            String pesoTexto = txtGramos.getText().trim();
+            if (pesoTexto.isEmpty()) {
+                JOptionPane.showMessageDialog(dialogoGranel, "Por favor, ingrese una cantidad.", "Campo Vacío", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            if (!pesoTexto.matches("^\\d+$")) {
+                JOptionPane.showMessageDialog(dialogoGranel, "Ingrese una cantidad válida en gramos.", "Error", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            double gramos = Double.parseDouble(pesoTexto);
+            if (gramos <= 0) {
+                JOptionPane.showMessageDialog(dialogoGranel, "La cantidad debe ser mayor a 0 gramos.", "Error", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Realizar conversión a Kg para pasárselo al ticket
+            cantidadAAgregar[0] = gramos / 1000.0;
+            precioAplicado[0] = productoEncontrado.getPrecioPorKg();
+            aceptado[0] = true;
+            dialogoGranel.dispose();
+        });
+
+        panelInferior.add(btnCancelar);
+        panelInferior.add(btnAceptar);
+        dialogoGranel.add(panelInferior, BorderLayout.SOUTH);
+
+        // Hacer visible la ventana modal
+        dialogoGranel.setVisible(true);
+
+        // Si el usuario cerró o canceló la ventana sin darle a Aceptar, detenemos el proceso
+        if (!aceptado[0]) {
+            return; 
+        }
+    }
+
+    // Agregar el producto al ticket (funciona tanto para piezas unitarias como para peso a granel)
+    agregarProductoAlTicket(productoEncontrado, cantidadAAgregar[0], precioAplicado[0]);
+}
 
     private class FilaProducto extends JPanel {
         private JSpinner spinnerCantidad;
@@ -641,58 +753,129 @@ private void agregarOIncrementarProducto(String nombre, double precio, String co
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+String skuEscaneado = jTextField1.getText().trim();
 
-        // Captura lo que el escáner acaba de leer
-    String skuEscaneado = jTextField1.getText().trim();
+if (!skuEscaneado.isEmpty()) {
+    // Buscar el producto en la BD
+    ProductoDAO dao = new ProductoDAO();
+    Producto productoEncontrado = dao.buscarPorSKUOBarra(skuEscaneado);
 
-    if (!skuEscaneado.isEmpty()) {
-        // Buscar el producto en la BD
-        ProductoDAO dao = new ProductoDAO();
-        Producto productoEncontrado = dao.buscarPorSKUOBarra(skuEscaneado);
+    if (productoEncontrado != null) {
+        // Si existe, preparar variables base
+        final double[] cantidadAAgregar = {1.0};
+        final double[] precioAplicado = {productoEncontrado.getPrecioVenta()};
+        final boolean[] continuarProceso = {true}; // Bandera de control por si cancela el diálogo
 
-        if (productoEncontrado != null) {
-            //  Si existe, mandarlo al panel
-            double cantidadAAgregar = 1.0;
-            double precioAplicado = productoEncontrado.getPrecioVenta();
+        // 2. Validar si es a granel
+        if (productoEncontrado.isEsGranel()) {
+            continuarProceso[0] = false; // Se detiene hasta que presione 'Aceptar'
 
-            // 2. Validar si es a granel
-            if (productoEncontrado.isEsGranel()) {
-                // Abrir el JDialog modal para pedir el peso
-                String inputPeso = JOptionPane.showInputDialog(this,
-                        "Producto a Granel: " + productoEncontrado.getNombre() + "\nIngrese el peso en Kg:",
-                        "Venta a Granel",
-                        JOptionPane.QUESTION_MESSAGE);
+            // Crear ventana modal emergente
+            JDialog dialogoGranel = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Venta a Granel", true);
+            dialogoGranel.setLayout(new BorderLayout(10, 10));
+            dialogoGranel.setSize(380, 240);
+            dialogoGranel.setLocationRelativeTo(this);
 
-                if (inputPeso == null || inputPeso.trim().isEmpty()) {
-                    return; // El usuario canceló la operación
+            // Mensaje superior informativo
+            JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            JLabel lblInstruccion = new JLabel("<html><center><b>" + productoEncontrado.getNombre() + "</b><br>Ingrese los gramos o seleccione una opción rápida:</center></html>");
+            lblInstruccion.setFont(new Font("Arial", Font.PLAIN, 13));
+            panelSuperior.add(lblInstruccion);
+            dialogoGranel.add(panelSuperior, BorderLayout.NORTH);
+
+            // Panel Central: Caja de texto + Botones rápidos
+            JPanel panelCentral = new JPanel();
+            panelCentral.setLayout(new BoxLayout(panelCentral, BoxLayout.Y_AXIS));
+            panelCentral.setBorder(BorderFactory.createEmptyBorder(5, 20, 5, 20));
+
+            JTextField txtGramos = new JTextField();
+            txtGramos.setFont(new Font("Arial", Font.BOLD, 14));
+            txtGramos.putClientProperty("JTextField.placeholderText", "Ej. 500 para medio kilo");
+            
+            // Filtro para aceptar únicamente números enteros directos
+            txtGramos.addKeyListener(new java.awt.event.KeyAdapter() {
+                @Override
+                public void keyTyped(java.awt.event.KeyEvent e) {
+                    char c = e.getKeyChar();
+                    if (!Character.isDigit(c)) {
+                        e.consume();
+                    }
                 }
+            });
+            panelCentral.add(txtGramos);
+            panelCentral.add(Box.createRigidArea(new Dimension(0, 10)));
 
-                // RNF-03: hasta 3 decimales; también rechaza negativos, notación científica, etc.
-                String pesoTexto = inputPeso.trim();
-                if (!pesoTexto.matches("^\\d{1,3}(\\.\\d{1,3})?$")) {
-                    JOptionPane.showMessageDialog(this, "Ingrese un peso válido en Kg (hasta 3 decimales).", "Peso no válido", JOptionPane.WARNING_MESSAGE);
+            // Fila de botones de peso rápido
+            JPanel panelBotonesRapidos = new JPanel(new GridLayout(1, 3, 8, 8));
+            JButton btnUno = new JButton("1 Kg");
+            JButton btnUnoMedia = new JButton("1.5 Kg");
+            JButton btnDos = new JButton("2 Kg");
+
+            btnUno.addActionListener(e -> txtGramos.setText("1000"));
+            btnUnoMedia.addActionListener(e -> txtGramos.setText("1500"));
+            btnDos.addActionListener(e -> txtGramos.setText("2000"));
+
+            panelBotonesRapidos.add(btnUno);
+            panelBotonesRapidos.add(btnUnoMedia);
+            panelBotonesRapidos.add(btnDos);
+            panelCentral.add(panelBotonesRapidos);
+            
+            dialogoGranel.add(panelCentral, BorderLayout.CENTER);
+
+            // Panel Inferior: Botones Aceptar / Cancelar
+            JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+            JButton btnCancelar = new JButton("Cancelar");
+            JButton btnAceptar = new JButton("Aceptar");
+            
+            btnCancelar.addActionListener(e -> dialogoGranel.dispose());
+            
+            btnAceptar.addActionListener(e -> {
+                String pesoTexto = txtGramos.getText().trim();
+                if (pesoTexto.isEmpty()) {
+                    JOptionPane.showMessageDialog(dialogoGranel, "Por favor, ingrese una cantidad.", "Campo Vacío", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
 
-                cantidadAAgregar = Double.parseDouble(pesoTexto);
-                if (cantidadAAgregar <= 0) {
-                    JOptionPane.showMessageDialog(this, "El peso debe ser mayor a cero.", "Peso no válido", JOptionPane.WARNING_MESSAGE);
+                if (!pesoTexto.matches("^\\d+$")) {
+                    JOptionPane.showMessageDialog(dialogoGranel, "Ingrese una cantidad válida en gramos.", "Error", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
-                precioAplicado = productoEncontrado.getPrecioPorKg();
-            }
 
-                // 3. Añadir al modelo del JTable del carrito
-                agregarProductoAlTicket(productoEncontrado, cantidadAAgregar, precioAplicado);
-            } else {
-                // El producto no existe o está mal registrado
-                JOptionPane.showMessageDialog(this, "Producto no encontrado: " + skuEscaneado, "Aviso", JOptionPane.WARNING_MESSAGE);
-            }
+                double gramos = Double.parseDouble(pesoTexto);
+                if (gramos <= 0) {
+                    JOptionPane.showMessageDialog(dialogoGranel, "La cantidad debe ser mayor a 0 gramos.", "Error", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
 
-            // PREPARACIÓN PARA EL SIGUIENTE ESCANEO (¡Crucial!)
-            jTextField1.setText(""); // Limpiamos el texto
-            jTextField1.requestFocus(); // Obligamos al cursor a quedarse parpadeando ahí
+                // Conversión matemática a kilogramos decimales para el sistema
+                cantidadAAgregar[0] = gramos / 1000.0;
+                precioAplicado[0] = productoEncontrado.getPrecioPorKg();
+                continuarProceso[0] = true; 
+                dialogoGranel.dispose();
+            });
+
+            panelInferior.add(btnCancelar);
+            panelInferior.add(btnAceptar);
+            dialogoGranel.add(panelInferior, BorderLayout.SOUTH);
+
+            // Abrir la ventana modal de forma síncrona
+            dialogoGranel.setVisible(true);
         }
+
+        // 3. Añadir al modelo si se validó correctamente o no era un producto a granel
+        if (continuarProceso[0]) {
+            agregarProductoAlTicket(productoEncontrado, cantidadAAgregar[0], precioAplicado[0]);
+        }
+
+    } else {
+        // El producto no existe o está mal registrado
+        JOptionPane.showMessageDialog(this, "Producto no encontrado: " + skuEscaneado, "Aviso", JOptionPane.WARNING_MESSAGE);
+    }
+
+    // PREPARACIÓN PARA EL SIGUIENTE ESCANEO (¡Crucial!)
+    jTextField1.setText(""); 
+    jTextField1.requestFocus(); 
+}
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void BotonTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonTotalActionPerformed
