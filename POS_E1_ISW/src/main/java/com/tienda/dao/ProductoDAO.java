@@ -120,16 +120,21 @@ public class ProductoDAO {
 
     public Producto buscarPorSKUOBarra(String criterio) {
         Producto prod = null;
-        // Agregamos contenido_neto, codigo_barras, es_granel y precio_por_kg: sin estos dos últimos
-        // la venta a granel y el descuento de inventario no funcionan cuando el producto se busca
-        // por escáner/SKU en vez de tomarlo del catálogo de botones.
+        // RF-02: la búsqueda manual encuentra el producto por SKU, por código de barras o por NOMBRE
+        // (coincidencia parcial). Se agregan contenido_neto, codigo_barras, es_granel y precio_por_kg
+        // porque sin estos la venta a granel y el descuento de inventario fallan al buscar manualmente.
+        // El ORDER BY prioriza las coincidencias exactas de SKU/código de barras sobre el nombre parcial.
         String sql = "SELECT id_producto, sku, nombre, precio_venta, contenido_neto, codigo_barras, es_granel, precio_por_kg "
-                + "FROM producto WHERE (sku = ? OR codigo_barras = ?) AND activo = 1";
+                + "FROM producto WHERE (sku = ? OR codigo_barras = ? OR nombre LIKE ?) AND activo = 1 "
+                + "ORDER BY (sku = ? OR codigo_barras = ?) DESC LIMIT 1";
 
         try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, criterio);
             ps.setString(2, criterio);
+            ps.setString(3, "%" + criterio + "%");
+            ps.setString(4, criterio);
+            ps.setString(5, criterio);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {

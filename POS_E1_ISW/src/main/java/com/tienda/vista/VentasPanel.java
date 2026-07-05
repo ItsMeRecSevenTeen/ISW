@@ -33,6 +33,12 @@ public class VentasPanel extends javax.swing.JPanel {
     private JPanel contenedorTarjetas;
     private JPanel TOTALPanel;
     
+    // Permite que MainFrame sepa si hay una venta iniciada y sin finalizar (carrito con productos),
+    // para no cerrar la aplicación en medio de un cobro.
+    public boolean hayVentaEnProgreso() {
+        return !productosAgregados.isEmpty();
+    }
+
     public VentasPanel() {
         initComponents();
         // RNF-02: el buscador acepta como máximo 10 caracteres alfanuméricos. Se usa un

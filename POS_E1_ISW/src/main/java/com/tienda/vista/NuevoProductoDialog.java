@@ -83,8 +83,14 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
         precioPorKgField.putClientProperty("JTextField.placeholderText", "Precio por Kg");
         precioPorKgField.setEnabled(false);
         esGranelCheck.addActionListener(e -> {
-            precioPorKgField.setEnabled(esGranelCheck.isSelected());
-            if (!esGranelCheck.isSelected()) {
+            boolean granel = esGranelCheck.isSelected();
+            precioPorKgField.setEnabled(granel);
+            // matriz fila 5 (Q5): un producto a granel se cobra por Kg, así que el "precio de venta"
+            // por pieza no aplica y se inhabilita para evitar la ambigüedad reportada por el tester.
+            precio.setEnabled(!granel);
+            if (granel) {
+                precio.setText("");
+            } else {
                 precioPorKgField.setText("");
             }
         });
@@ -137,6 +143,11 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
         esGranelCheck.setSelected(prod.isEsGranel());
         precioPorKgField.setEnabled(prod.isEsGranel());
         precioPorKgField.setText(prod.isEsGranel() ? String.format("%.2f", prod.getPrecioPorKg()) : "");
+        // Coherente con el checkbox: si es granel, el precio de venta por pieza queda inhabilitado.
+        precio.setEnabled(!prod.isEsGranel());
+        if (prod.isEsGranel()) {
+            precio.setText("");
+        }
 
         // tipo_producto no se persiste en la BD; se fija un valor válido para no bloquear el guardado
         if (tipoProducto.getItemCount() > 1) {
@@ -157,6 +168,7 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
     esGranelCheck.setSelected(false);
     precioPorKgField.setText("");
     precioPorKgField.setEnabled(false);
+    precio.setEnabled(true); // se reactiva por si el producto anterior era granel
 
     // Reseteamos el SKU a su estado inicial
     SKUgen.setText("---");
@@ -370,9 +382,11 @@ private void sanitizarCampo(javax.swing.JTextField campo, String regex, int maxL
 
     private void aceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aceptarActionPerformed
         // --- VALIDACIONES DE CAMPOS VACÍOS ---
+        boolean esGranelSel = esGranelCheck.isSelected();
         if (nombre.getText().trim().isEmpty() || marca.getText().trim().isEmpty()
                 || tamano.getText().trim().isEmpty() || precioCompra.getText().trim().isEmpty()
-                || precio.getText().trim().isEmpty() || stock.getText().trim().isEmpty()
+                || (!esGranelSel && precio.getText().trim().isEmpty()) // el precio de venta solo se exige si NO es granel
+                || stock.getText().trim().isEmpty()
                 || stockMinimo1.getText().trim().isEmpty()
                 || CodigoBarras.getText().trim().isEmpty()
                 || (tipoProducto.getSelectedIndex() <= 0 || tipoProducto.getSelectedItem().toString().equals("Seleccione un tipo"))) {
@@ -416,12 +430,14 @@ private void sanitizarCampo(javax.swing.JTextField campo, String regex, int maxL
             String contenidoNeto = tamano.getText().trim();
             String codBarras = CodigoBarras.getText().trim();
 
+            boolean esGranel = esGranelCheck.isSelected();
+
             double dPrecioCompra = Double.parseDouble(precioCompra.getText().trim());
-            double dPrecioVenta = Double.parseDouble(precio.getText().trim());
+            // Para granel no hay precio de venta por pieza (se cobra por Kg): se guarda 0.
+            double dPrecioVenta = esGranel ? 0.0 : Double.parseDouble(precio.getText().trim());
             double dStockActual = Double.parseDouble(stock.getText().trim());
             double dStockMinimo = Double.parseDouble(stockMinimo1.getText().trim());
 
-            boolean esGranel = esGranelCheck.isSelected();
             double dPrecioPorKg = esGranel ? Double.parseDouble(precioPorKgField.getText().trim()) : 0.0;
 
             // --- GUARDADO EN BASE DE DATOS ---
