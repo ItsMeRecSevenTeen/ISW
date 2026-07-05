@@ -101,7 +101,7 @@ public class CajeroLoginPanel extends javax.swing.JPanel {
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jButton1.setBackground(new java.awt.Color(250, 247, 251));
-        jButton1.setForeground(new java.awt.Color(165, 104, 188));
+        jButton1.setForeground(new java.awt.Color(123, 63, 160));
         jButton1.setText("Atrás");
         jButton1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);

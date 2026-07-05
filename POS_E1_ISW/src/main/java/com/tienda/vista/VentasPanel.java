@@ -35,15 +35,9 @@ public class VentasPanel extends javax.swing.JPanel {
     
     public VentasPanel() {
         initComponents();
-        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
-    @Override
-    public void keyTyped(java.awt.event.KeyEvent e) {
-        // Si el texto ya tiene 10 caracteres, consume el evento para no escribir el nuevo carácter
-        if (jTextField1.getText().length() >= 10) {
-            e.consume(); // Detiene la entrada de texto
-        }
-    }
-});
+        // RNF-02: el buscador acepta como máximo 10 caracteres alfanuméricos. Se usa un
+        // DocumentFilter (no un KeyListener) para que el límite también aplique al pegar (Ctrl+V).
+        com.tienda.util.Sanitizador.limitarTexto(jTextField1, "^[a-zA-Z0-9]*$", 10);
         this.setOpaque(false);
         configurarEstructuraCardLayout(); // Inicializa la navegación antes que los paneles internos
         
@@ -150,14 +144,21 @@ public class VentasPanel extends javax.swing.JPanel {
     // MODIFICADO: Acción del botón usando ConfirmacionDialog
     btnRegresar.addActionListener(e -> {
         boolean confirmado = ConfirmacionDialog.confirmarAccionDestructiva(
-                this, 
-                "Cancelar Venta", 
-                "¿Estás seguro de querer cancelar la compra actual y volver al inicio?", 
+                this,
+                "Cancelar Venta",
+                "¿Estás seguro de querer cancelar la compra actual y volver al inicio?",
                 "Sí, Salir"
         );
-        
-        // Si el usuario confirma, regresamos a la pantalla de ventas
+
+        // RIU-03-03: si confirma "cancelar la compra", se vacía el carrito de verdad
+        // (antes solo se navegaba de regreso y los productos seguían en la mesa de venta).
         if (confirmado) {
+            productosAgregados.clear();
+            panelListaProductos.removeAll();
+            costoTotal = 0.0;
+            actualizarBotonTotal();
+            panelListaProductos.revalidate();
+            panelListaProductos.repaint();
             navegador.show(contenedorTarjetas, "PANTALLA_VENTAS");
         }
     });
@@ -258,11 +259,11 @@ public class VentasPanel extends javax.swing.JPanel {
 
         JButton btnEfectivo = new JButton("Efectivo 💵");
         btnEfectivo.setFont(new Font("Arial", Font.BOLD, 12));
-        btnEfectivo.setForeground(new Color(165,104,188));
+        btnEfectivo.setForeground(new Color(123, 63, 160));
 
         JButton btnTarjeta = new JButton("Tarjeta 💳");
         btnTarjeta.setFont(new Font("Arial", Font.BOLD, 12));
-        btnTarjeta.setForeground(new Color(165,104,188));
+        btnTarjeta.setForeground(new Color(123, 63, 160));
         btnTarjeta.addActionListener(e -> finalizarTransaccion("Tarjeta", ivaPorcentaje, ivaMonto, totalConIva, totalConIva, 0));
 
         // Lógica de transición de cobro por Efectivo
@@ -348,6 +349,23 @@ public class VentasPanel extends javax.swing.JPanel {
     }
 
     private void finalizarTransaccion(String metodoPago, double ivaPorcentaje, double ivaMonto, double totalConIva, double montoRecibido, double cambio) {
+        // RF-07: no permitir vender más de lo disponible. Se valida el stock real de cada
+        // producto contra lo pedido ANTES de registrar la venta, para evitar stock negativo.
+        com.tienda.dao.ProductoDAO validadorStock = new com.tienda.dao.ProductoDAO();
+        for (FilaProducto fila : productosAgregados.values()) {
+            double cantidadPedida = ((Number) fila.spinnerCantidad.getValue()).doubleValue();
+            double disponible = validadorStock.getStockActual(fila.codigoBarras);
+            if (cantidadPedida > disponible) {
+                String pedidoTxt = (cantidadPedida % 1 == 0) ? String.format("%.0f", cantidadPedida) : String.format("%.3f", cantidadPedida);
+                String dispTxt = (disponible % 1 == 0) ? String.format("%.0f", disponible) : String.format("%.3f", disponible);
+                JOptionPane.showMessageDialog(this,
+                        "Stock insuficiente de \"" + fila.nombreProd + "\".\nDisponible: " + dispTxt + "  |  Solicitado: " + pedidoTxt
+                        + "\n\nAjusta la cantidad para poder completar la venta.",
+                        "Stock insuficiente", JOptionPane.WARNING_MESSAGE);
+                return; // Se aborta la transacción; no se registra ni se descuenta nada.
+            }
+        }
+
         // 1. Armar y registrar la venta + su detalle en una sola transacción (RF-04, RF-07, RNF-07)
         com.tienda.modelo.Venta venta = new com.tienda.modelo.Venta();
         venta.setIdUsuario(com.tienda.util.Sesion.getInstancia().getIdCajero());
@@ -637,17 +655,21 @@ private void agregarOIncrementarProducto(String nombre, double precio, String co
 
             SpinnerNumberModel modelo = new SpinnerNumberModel(cantidadInicial, 0.0, 999.0, 1.0);
             spinnerCantidad = new JSpinner(modelo);
-            Dimension dimSpinner = new Dimension(60, 26);
+            // Se ensancha un poco para que quepan 3 decimales de granel (ej. "1.256") sin recortarse.
+            Dimension dimSpinner = new Dimension(78, 26);
             spinnerCantidad.setPreferredSize(dimSpinner);
             spinnerCantidad.setMinimumSize(dimSpinner);
             spinnerCantidad.setMaximumSize(dimSpinner);
 
-            JComponent editor = spinnerCantidad.getEditor();
-            if (editor instanceof JSpinner.DefaultEditor) {
-                JFormattedTextField txtField = ((JSpinner.DefaultEditor) editor).getTextField();
-                txtField.setFont(new Font("Arial", Font.PLAIN, 12));
-                txtField.setHorizontalAlignment(JTextField.CENTER);
-            }
+            // RNF-03: el peso a granel puede llevar hasta 3 decimales (ej. 1.256 Kg).
+            // El patrón "0.###" muestra hasta 3 decimales sin ceros de relleno, así que
+            // las piezas enteras se ven "1" y el granel "1.256".
+            JSpinner.NumberEditor editor = new JSpinner.NumberEditor(spinnerCantidad, "0.###");
+            spinnerCantidad.setEditor(editor);
+            spinnerCantidad.setValue(cantidadInicial); // fuerza el refresco del texto con el nuevo formato
+            JFormattedTextField txtField = editor.getTextField();
+            txtField.setFont(new Font("Arial", Font.PLAIN, 12));
+            txtField.setHorizontalAlignment(JTextField.CENTER);
 
             gbc.gridx = 1;
             gbc.weightx = 0.0; 

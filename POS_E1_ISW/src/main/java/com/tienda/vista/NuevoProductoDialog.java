@@ -94,6 +94,10 @@ public class NuevoProductoDialog extends javax.swing.JDialog {
         // Reemplaza los tipos hardcodeados del .form por los persistidos en la BD
         cargarTiposProducto();
 
+        // El pack() generado por NetBeans (formSizePolicy=1) sobre AbsoluteLayout deja la
+        // ventana demasiado justa y recorta el botón "Aceptar" (que termina en y≈450).
+        // Se fija aquí, fuera del código generado, un tamaño que muestra todos los campos.
+        setSize(400, 520);
         setLocationRelativeTo(parent);
 
         if (idProductoEditar != null) {
@@ -224,13 +228,13 @@ private void sanitizarCampo(javax.swing.JTextField campo, String regex, int maxL
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         tipoProducto.setBackground(new java.awt.Color(250, 247, 251));
-        tipoProducto.setForeground(new java.awt.Color(165, 104, 188));
+        tipoProducto.setForeground(new java.awt.Color(123, 63, 160));
         tipoProducto.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione un tipo", "Refrescos", "Frituras", "Lacteos", "Dulces" }));
         tipoProducto.addActionListener(this::tipoProductoActionPerformed);
         getContentPane().add(tipoProducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 150, -1));
 
         agregarTipo.setBackground(new java.awt.Color(250, 247, 251));
-        agregarTipo.setForeground(new java.awt.Color(165, 104, 188));
+        agregarTipo.setForeground(new java.awt.Color(123, 63, 160));
         agregarTipo.setText("Agregar tipo +");
         agregarTipo.addActionListener(this::agregarTipoActionPerformed);
         getContentPane().add(agregarTipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 50, -1, -1));
@@ -265,7 +269,7 @@ private void sanitizarCampo(javax.swing.JTextField campo, String regex, int maxL
         getContentPane().add(aceptar, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 420, -1, 30));
 
         generarSku.setBackground(new java.awt.Color(250, 247, 251));
-        generarSku.setForeground(new java.awt.Color(165, 104, 188));
+        generarSku.setForeground(new java.awt.Color(123, 63, 160));
         generarSku.setText("Generar SKU");
         generarSku.addActionListener(this::generarSkuActionPerformed);
         getContentPane().add(generarSku, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 280, -1, -1));

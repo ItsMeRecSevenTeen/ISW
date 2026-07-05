@@ -239,6 +239,24 @@ public class ProductoDAO {
             return false;
         }
     }
+  // RF-07: stock disponible actual de un producto (por código de barras).
+  // Devuelve -1 si el producto no existe, para distinguirlo de un stock 0 real.
+  public double getStockActual(String codigoBarras) {
+        String sql = "SELECT stock_actual FROM producto WHERE codigo_barras = ?";
+
+        try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, codigoBarras);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("stock_actual");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al consultar el stock de " + codigoBarras + ": " + e.getMessage());
+        }
+        return -1;
+    }
+
   public boolean restarInventario(String codigoBarras, double cantidadVendida) {
         String sql = "UPDATE producto SET stock_actual = stock_actual - ? WHERE codigo_barras = ?";
 

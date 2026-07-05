@@ -91,7 +91,7 @@ public class LoginPanel extends javax.swing.JPanel {
 
         jButton1.setBackground(new java.awt.Color(250, 247, 251));
         jButton1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(165, 104, 188));
+        jButton1.setForeground(new java.awt.Color(123, 63, 160));
         jButton1.setText("ADMINISTRADOR");
         jButton1.setToolTipText("");
         jButton1.setFocusable(false);
@@ -102,7 +102,7 @@ public class LoginPanel extends javax.swing.JPanel {
 
         jButton2.setBackground(new java.awt.Color(250, 247, 251));
         jButton2.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
-        jButton2.setForeground(new java.awt.Color(165, 104, 188));
+        jButton2.setForeground(new java.awt.Color(123, 63, 160));
         jButton2.setText("CAJERO");
         jButton2.setFocusable(false);
         jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
