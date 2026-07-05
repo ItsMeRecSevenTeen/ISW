@@ -781,12 +781,18 @@ private void agregarOIncrementarProducto(String nombre, double precio, String co
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+// [TC-RNF01-01] Inicio de la lectura (escaneo/búsqueda manual): se mide hasta que el producto
+// entra al carrito, para verificar el límite de respuesta de 1.5 s (RNF-01).
+long inicioEscaneo = System.nanoTime();
 String skuEscaneado = jTextField1.getText().trim();
 
 if (!skuEscaneado.isEmpty()) {
     // Buscar el producto en la BD
     ProductoDAO dao = new ProductoDAO();
+    long inicioBD = System.nanoTime();
     Producto productoEncontrado = dao.buscarPorSKUOBarra(skuEscaneado);
+    long msBD = (System.nanoTime() - inicioBD) / 1_000_000;
+    System.out.println("[TC-RNF01-01] Consulta del producto en BD: " + msBD + " ms");
 
     if (productoEncontrado != null) {
         // Si existe, preparar variables base
@@ -893,6 +899,12 @@ if (!skuEscaneado.isEmpty()) {
         // 3. Añadir al modelo si se validó correctamente o no era un producto a granel
         if (continuarProceso[0]) {
             agregarProductoAlTicket(productoEncontrado, cantidadAAgregar[0], precioAplicado[0]);
+            // Para un producto por pieza el tiempo es puramente del sistema (escaneo -> carrito).
+            // En granel se omite porque incluiría lo que el cajero tarda en teclear el peso en el modal.
+            if (!productoEncontrado.isEsGranel()) {
+                long msTotal = (System.nanoTime() - inicioEscaneo) / 1_000_000;
+                System.out.println("[TC-RNF01-01] Escaneo -> producto en carrito: " + msTotal + " ms (limite <= 1500 ms)");
+            }
         }
 
     } else {

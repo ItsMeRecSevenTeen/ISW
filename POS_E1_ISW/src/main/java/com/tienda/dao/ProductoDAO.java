@@ -60,6 +60,10 @@ public class ProductoDAO {
         // Añadimos 'codigo_barras' a la consulta SQL
         String sql = "INSERT INTO producto (sku, nombre, precio_compra, precio_venta, stock_actual, stock_minimo, codigo_barras, es_granel, precio_por_kg, contenido_neto, marca) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
+        // [TC-RIU04-02 / TC-RIU04-03] Medición del tiempo de comunicación con la BD (conexión + INSERT).
+        // El mensaje de éxito/error se muestra justo después, así que este tiempo indica si la
+        // retroalimentación llega dentro del límite de 500 ms exigido por RIU-04.
+        long inicioBD = System.nanoTime();
         try (Connection conn = Conexion.getConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, sku);
@@ -75,9 +79,13 @@ public class ProductoDAO {
             pstmt.setString(11, marca);
 
             int filasAfectadas = pstmt.executeUpdate();
+            long msBD = (System.nanoTime() - inicioBD) / 1_000_000;
+            System.out.println("[TC-RIU04-02] Alta de producto en BD (exito): " + msBD + " ms (limite <= 500 ms)");
             return filasAfectadas > 0;
 
         } catch (SQLException e) {
+            long msBD = (System.nanoTime() - inicioBD) / 1_000_000;
+            System.out.println("[TC-RIU04-03] Alta de producto en BD (error): " + msBD + " ms (limite <= 500 ms)");
             javax.swing.JOptionPane.showMessageDialog(null, "Error al insertar el producto: " + e.getMessage(),
                     "Error de Base de Datos", javax.swing.JOptionPane.ERROR_MESSAGE);
             return false;
@@ -205,6 +213,8 @@ public class ProductoDAO {
                 + "es_granel = ?, precio_por_kg = ? "
                 + "WHERE id_producto = ?";
 
+        // [TC-RIU04-02 / TC-RIU04-03] Tiempo de comunicación con la BD al modificar un producto.
+        long inicioBD = System.nanoTime();
         try (Connection conn = Conexion.getConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, sku);
@@ -221,9 +231,13 @@ public class ProductoDAO {
             pstmt.setInt(12, idProducto);
 
             int filasAfectadas = pstmt.executeUpdate();
+            long msBD = (System.nanoTime() - inicioBD) / 1_000_000;
+            System.out.println("[TC-RIU04-02] Modificar producto en BD (exito): " + msBD + " ms (limite <= 500 ms)");
             return filasAfectadas > 0;
 
         } catch (SQLException e) {
+            long msBD = (System.nanoTime() - inicioBD) / 1_000_000;
+            System.out.println("[TC-RIU04-03] Modificar producto en BD (error): " + msBD + " ms (limite <= 500 ms)");
             javax.swing.JOptionPane.showMessageDialog(null, "Error al actualizar el producto: " + e.getMessage(),
                     "Error de Base de Datos", javax.swing.JOptionPane.ERROR_MESSAGE);
             return false;
