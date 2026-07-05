@@ -126,7 +126,7 @@ public class AperturaCaja extends javax.swing.JPanel {
         add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 540, 240, -1));
 
         jButton1.setBackground(new java.awt.Color(250, 247, 251));
-        jButton1.setForeground(new java.awt.Color(165, 104, 188));
+        jButton1.setForeground(new java.awt.Color(123, 63, 160));
         jButton1.setText("Atrás");
         jButton1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);

@@ -34,6 +34,8 @@ public class InventarioPanel extends javax.swing.JPanel {
     // elementos (rellena con null si faltan, TRUNCA si sobran), así que no se puede
     // guardar el id en una columna "oculta" más allá de las 7 declaradas.
     private final java.util.List<Integer> idsProductosEnTabla = new java.util.ArrayList<>();
+    // RF-06-02: estado del filtro "Stock Bajo" (false = catálogo completo, true = solo críticos)
+    private boolean filtroStockBajoActivo = false;
 
     /**
      * Creates new form InventarioPanel
@@ -117,7 +119,7 @@ public class InventarioPanel extends javax.swing.JPanel {
         jButton5.setText("<html><body style='margin-top: 2px;'>Stock Bajo</body></html>");
         jButton5.putClientProperty("FlatLaf.style", "font: 20 'DearSans-Book'");
         jButton5.putClientProperty("JButton.buttonType", "roundRect");
-        jButton5.addActionListener(e -> ordenarPorStockBajo());
+        jButton5.addActionListener(e -> alternarFiltroStockBajo());
     }
 
     // Columna "Acciones": botones Modificar/Borrar resueltos contra idsProductosEnTabla
@@ -198,59 +200,29 @@ public class InventarioPanel extends javax.swing.JPanel {
             // 7 columnas declaradas, así que ese 8vo elemento nunca sobrevive en el modelo.
             idsProductosEnTabla.add((Integer) fila[7]);
         }
+
+        // RF-06-02: si el filtro "Stock Bajo" está activo, tras recargar se deja solo lo crítico.
+        // Así el filtro se respeta también después de editar/borrar un producto.
+        if (filtroStockBajoActivo) {
+            for (int i = modelo.getRowCount() - 1; i >= 0; i--) {
+                double stockActual = ((Number) modelo.getValueAt(i, 5)).doubleValue();
+                double stockMinimo = ((Number) modelo.getValueAt(i, 6)).doubleValue();
+                if (stockActual > stockMinimo) {
+                    modelo.removeRow(i);
+                    idsProductosEnTabla.remove(i);
+                }
+            }
+        }
     }
-    private void ordenarPorStockBajo() {
-        DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
-        int numeroFilas = modelo.getRowCount();
 
-        if (numeroFilas == 0) return;
-
-        // Estructuras temporales para dividir los registros
-        java.util.List<Object[]> criticosFilas = new java.util.ArrayList<>();
-        java.util.List<Integer> criticosIds = new java.util.ArrayList<>();
-
-        java.util.List<Object[]> normalesFilas = new java.util.ArrayList<>();
-        java.util.List<Integer> normalesIds = new java.util.ArrayList<>();
-
-        // 1. Clasificar filas evaluando las columnas 5 (Stock Actual) y 6 (Stock Mínimo)
-        for (int i = 0; i < numeroFilas; i++) {
-            double stockActual = ((Number) modelo.getValueAt(i, 5)).doubleValue();
-            double stockMinimo = ((Number) modelo.getValueAt(i, 6)).doubleValue();
-            int idActual = idsProductosEnTabla.get(i);
-
-            // Reconstruir el arreglo de objetos de la fila actual de la tabla
-            int numColumnas = modelo.getColumnCount();
-            Object[] datosFila = new Object[numColumnas];
-            for (int col = 0; col < numColumnas; col++) {
-                datosFila[col] = modelo.getValueAt(i, col);
-            }
-
-            if (stockActual <= stockMinimo) {
-                criticosFilas.add(datosFila);
-                criticosIds.add(idActual);
-            } else {
-                normalesFilas.add(datosFila);
-                normalesIds.add(idActual);
-            }
-        }
-
-        // 2. Limpiar las vistas y listas actuales
-        modelo.setRowCount(0);
-        idsProductosEnTabla.clear();
-
-        // 3. Volver a insertar primero los críticos (Stock Bajo)
-        for (int i = 0; i < criticosFilas.size(); i++) {
-            modelo.addRow(criticosFilas.get(i));
-            idsProductosEnTabla.add(criticosIds.get(i));
-        }
-
-        // 4. Insertar después los productos que están estables o normales
-        for (int i = 0; i < normalesFilas.size(); i++) {
-            modelo.addRow(normalesFilas.get(i));
-            idsProductosEnTabla.add(normalesIds.get(i));
-        }
-        
-        // Refrescar componentes gráficos
+    // RF-06-02: el botón alterna entre mostrar SOLO los productos en stock crítico
+    // (stock_actual <= stock_minimo) y volver a mostrar el catálogo completo.
+    private void alternarFiltroStockBajo() {
+        filtroStockBajoActivo = !filtroStockBajoActivo;
+        jButton5.setText(filtroStockBajoActivo
+                ? "<html><body style='margin-top: 2px;'>Ver todos</body></html>"
+                : "<html><body style='margin-top: 2px;'>Stock Bajo</body></html>");
+        cargarProductosEnTabla();
         jTable1.revalidate();
         jTable1.repaint();
     }
@@ -317,19 +289,19 @@ public class InventarioPanel extends javax.swing.JPanel {
         add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 20, 130, 130));
 
         jButton1.setBackground(new java.awt.Color(250, 247, 251));
-        jButton1.setForeground(new java.awt.Color(165, 104, 188));
+        jButton1.setForeground(new java.awt.Color(123, 63, 160));
         jButton1.setText("Dar de alta nuevo producto");
         jButton1.addActionListener(this::jButton1ActionPerformed);
         add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 190, 370, -1));
 
         jButton2.setBackground(new java.awt.Color(250, 247, 251));
-        jButton2.setForeground(new java.awt.Color(165, 104, 188));
+        jButton2.setForeground(new java.awt.Color(123, 63, 160));
         jButton2.setText("Agregar cajero");
         jButton2.addActionListener(this::jButton2ActionPerformed);
         add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 190, 270, -1));
 
         jButton3.setBackground(new java.awt.Color(250, 247, 251));
-        jButton3.setForeground(new java.awt.Color(165, 104, 188));
+        jButton3.setForeground(new java.awt.Color(123, 63, 160));
         jButton3.setText("Modificar IVA");
         jButton3.addActionListener(this::jButton3ActionPerformed);
         add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 190, 260, -1));
