@@ -31,17 +31,43 @@ public class MainFrame extends javax.swing.JFrame {
     // Evita que Alt+F4 o el botón de cerrar tiren la aplicación sin avisar,
     // dejando un turno de caja abierto o una venta a medias en curso.
     private void confirmarCierre() {
+        // 1. Si hay una venta en curso (carrito con productos), primero hay que finalizarla o cancelarla.
+        if (hayVentaEnProgreso()) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Hay una venta en progreso. Finalízala o cancélala antes de cerrar la aplicación.",
+                    "Venta en progreso", javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // 2. Si el turno de caja sigue abierto, no se sale dejándolo abierto: se lleva al cierre de caja.
         boolean turnoAbierto = com.tienda.util.Sesion.getInstancia().getIdTurno() > 0;
+        if (turnoAbierto) {
+            boolean irACierre = ConfirmacionDialog.confirmarAccionDestructiva(this, "Cierre de caja requerido",
+                    "Tienes un turno de caja abierto. Para salir primero debes cerrar el turno de caja. "
+                            + "¿Ir al cierre de caja ahora?",
+                    "Ir al cierre");
+            if (irACierre) {
+                cambiarPanel(new CierreCaja());
+            }
+            return;
+        }
 
-        String mensaje = turnoAbierto
-                ? "Tienes un turno de caja abierto. Si cierras la aplicación sin hacer el cierre de caja, "
-                        + "el turno quedará abierto en el sistema. ¿Deseas salir de todos modos?"
-                : "¿Seguro que deseas cerrar la aplicación?";
-
-        boolean confirmado = ConfirmacionDialog.confirmarAccionDestructiva(this, "Confirmación", mensaje, "Salir");
+        // 3. Sin venta ni turno abierto: cierre normal de la aplicación.
+        boolean confirmado = ConfirmacionDialog.confirmarAccionDestructiva(this, "Confirmación",
+                "¿Seguro que deseas cerrar la aplicación?", "Salir");
         if (confirmado) {
             System.exit(0);
         }
+    }
+
+    // Revisa si el panel actualmente mostrado es un VentasPanel con una venta iniciada.
+    private boolean hayVentaEnProgreso() {
+        for (java.awt.Component comp : getContentPane().getComponents()) {
+            if (comp instanceof VentasPanel && ((VentasPanel) comp).hayVentaEnProgreso()) {
+                return true;
+            }
+        }
+        return false;
     }
     public void cambiarPanel(JPanel nuevoPanel) {
         this.getContentPane().removeAll();  // Borra el panel actual (LoginPanel)
