@@ -2,6 +2,7 @@ package com.tienda.vista;
 
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,8 +43,8 @@ public class AccionesProductoColumn extends AbstractCellEditor implements TableC
     }
 
     private JPanel crearPanelBotones(JButton botonModificar, JButton botonBorrar) {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 0));
-        Insets margen = new Insets(1, 6, 1, 6);
+        JPanel panel = new JPanel(new GridLayout(1, 2, 4, 0));
+        Insets margen = new Insets(1, 1, 1, 1);
         botonModificar.setMargin(margen);
         botonBorrar.setMargin(margen);
         botonModificar.setFocusPainted(false);

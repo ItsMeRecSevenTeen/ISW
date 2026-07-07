@@ -18,7 +18,7 @@ CREATE TABLE `producto` (
 
 CREATE TABLE `usuario` (
   `id_usuario` INT PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador interno del usuario',
-  `nombre_usuario` VARCHAR(50) UNIQUE NOT NULL COMMENT 'Credencial de acceso (username) del empleado',
+  `nombre_usuario` VARCHAR(50) COLLATE utf8mb4_bin NOT NULL UNIQUE COMMENT 'Credencial de acceso (username) del empleado',
   `contrasena_hash` VARCHAR(255) NOT NULL COMMENT 'Hash de seguridad bcrypt (factor 10) de la contraseña',
   `rol` tinyint NOT NULL COMMENT 'Nivel de acceso y permisos dentro del sistema, 0: administrador, 1: cajero',
   `activo` BOOLEAN NOT NULL DEFAULT true COMMENT 'Bandera lógica para permitir o denegar el acceso'
